@@ -33,7 +33,7 @@ const url_state : any = writable({ path : '', query : ''});
   const common_toast_state : any = writable({type : 'success', value : false, counter : 4 });
 
   const common_search_state : any = writable({
-    start_date : moment().subtract(1, "year").format('YYYY-MM-DD'),
+    start_date : moment().subtract(1, "month").format('YYYY-MM-DD'),
     end_date : moment().add(1, "day").format('YYYY-MM-DD'),
     search_text : '',
     filter : [],

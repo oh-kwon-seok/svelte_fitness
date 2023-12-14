@@ -13,7 +13,7 @@ import moment from 'moment';
 import {TOAST_SAMPLE} from '$lib/module/common/constants';
 import {TabulatorFull as Tabulator} from 'tabulator-tables';
 import {TABLE_TOTAL_CONFIG,TABLE_HEADER_CONFIG,TABLE_FILTER} from '$lib/module/common/constants';
-
+import { setCookie, getCookie, removeCookie } from '$lib/cookies';
 const api = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -85,32 +85,33 @@ common_selected_state.subscribe((data) => {
 
 
 
-const userModalOpen = (data : any, title : any) => {
- console.log('data : ', data);
+const userModalOpen = () => {
+  
 
-  console.log('title : ', title);
   
     alert['type'] = 'save';
     alert['value'] = false;
     
     common_alert_state.update(() => alert);
-    update_modal['title'] = title;
-    update_modal[title]['use'] = true;
+    update_modal['title'] = 'update';
+    update_modal['update']['use'] = true;
     user_modal_state.update(() => update_modal);
 
     console.log('update_modal : ', update_modal);
+    let user_uid = getCookie('my-cookie');
+    let filtered_user_data = user_data.filter(item => {
+      return user_uid === item.id; 
+    })
 
-    if(title === 'add'){
-      user_form_state.update(() => init_form_data);
-     
-    }
-    if(title === 'update' ){
-
+    // console.log('update_form : ', update_form)
+    // return console.log('filtered_user_data : ', filtered_user_data);
+  
+    
         Object.keys(update_form).map((item)=> {    
             if(item === 'car'){
-              update_form[item] = data[item]['uid'];
+              update_form[item] = filtered_user_data[0][item]['uid'];
             }else{
-              update_form[item] = data[item];
+              update_form[item] = filtered_user_data[0][item];
             }
            
         }); 
@@ -119,24 +120,6 @@ const userModalOpen = (data : any, title : any) => {
             user_modal_state.update(() => update_modal);
             console.log('update_modal : ', update_modal);
 
-    }
-    if(title === 'check_delete'){
-      let data =  table_data['user'].getSelectedData();
-
-      common_selected_state.update(() => data);
-      
-      console.log('modalOpen : ', data);
-      let uid_array = [];
-      if(data.length === 0){
-        alert['value'] = true;
-        common_alert_state.update(() => alert);
-
-      }else{
-        for(let i=0; i<data.length; i++){
-          uid_array.push(data[i]['id']);
-        }
-      }
-  }
 }
 
 
@@ -183,77 +166,10 @@ const save = (param,title) => {
   update_modal['title'] = 'add';
   update_modal['add']['use'] = true;
  
-    if(title === 'add'){
-      console.log('param : ', param);
-    
-      if( param['code'] === '' || param['car'] === ''){
-        //return common_toast_state.update(() => TOAST_SAMPLE['fail']);
-        alert['type'] = 'save';
-        alert['value'] = true;
-        user_modal_state.update(() => update_modal);
- 
-        return common_alert_state.update(() => alert);
-  
-      }else {
-      
-        const url = `${api}/user/save`
-        try {
-  
-          
-          let params = {
-            id : param.code,
-            code : param.code,
-            name : param.name,
-            customer_name : param.customer_name,
-            email : param.email,
-            phone : param.phone,
-            password : param.password,
-            car_uid : param.car,
-            used : param.used,
-            auth : 'user',
-            token : login_data['token'],
-          };
-        axios.post(url,
-          params,
-        ).then(res => {
-          console.log('res',res);
-          if(res.data !== undefined && res.data !== null && res.data !== '' ){
-            console.log('실행');
-            console.log('res:data', res.data);
-            
-            toast['type'] = 'success';
-            toast['value'] = true;
-            update_modal['title'] = '';
-            update_modal['add']['use'] = !update_modal['add']['use'];
-            user_modal_state.update(() => update_modal);
-
-            
-
-            return common_toast_state.update(() => toast);
-
-          }else{
-          
-            return common_toast_state.update(() => TOAST_SAMPLE['fail']);
-          }
-        })
-        }catch (e:any){
-          return console.log('에러 : ',e);
-        };
-      }
-
-
-    
-    }
     
     if(title === 'update'){
       const url = `${api}/user/update`
       
-      
-      let data =  table_data['user_product'].getSelectedData();
-
-      let checked_data = data.filter(item => {
-        return parseInt(item.qty) > 0 && item.qty !== undefined 
-      })
 
      
      
@@ -268,12 +184,11 @@ const save = (param,title) => {
           customer_name : param.customer_name,
           email : param.email,
           phone : param.phone,
-          
           car_uid : param.car,
           used : param.used,
           auth : 'user',
           token : login_data['token'],
-          user_product : checked_data,
+         
 
         };
       axios.post(url,
@@ -290,7 +205,7 @@ const save = (param,title) => {
           update_modal['update']['use'] = false;
           user_modal_state.update(() => update_modal);
           user_form_state.update(()=> init_form_data);
-          select_query('user');
+        
           return common_toast_state.update(() => toast);
 
         }else{
@@ -304,62 +219,6 @@ const save = (param,title) => {
 
 
      
-    }if(title === 'check_delete'){
-      let data =  selected_data;
-      let uid_array = [];
-
-      console.log('deleted_data : ', data);
-      if(data.length === 0){
-        alert['value'] = true;
-        common_alert_state.update(() => alert);
-
-      }else{
-        for(let i=0; i<data.length; i++){
-          uid_array.push(data[i]['id']);
-        }
-      }
-
-        if(uid_array.length > 0){
-
-          const url = `${api}/user/delete`
-          try {
-    
-            let params = {
-              id : uid_array,
-            };
-          axios.post(url,
-            params,
-          ).then(res => {
-            console.log('res',res);
-            if(res.data !== undefined && res.data !== null && res.data !== '' ){
-              console.log('실행');
-              console.log('res:data', res.data);
-              
-              toast['type'] = 'success';
-              toast['value'] = true;
-              update_modal['title'] = '';
-              update_modal['update']['use'] = false;
-              user_modal_state.update(() => update_modal);
-              user_form_state.update(()=> init_form_data);
-
-              select_query('user');
-    
-              return common_toast_state.update(() => toast);
-    
-            }else{
-            
-              return common_toast_state.update(() => TOAST_SAMPLE['fail']);
-            }
-          })
-          }catch (e:any){
-            return console.log('에러 : ',e);
-          };
-    
-        }
-
-        update_modal[title]['use'] = !update_modal[title]['use'];
-        user_modal_state.update(() => update_modal);
-        user_form_state.update(()=> init_form_data);
     }
   }
 

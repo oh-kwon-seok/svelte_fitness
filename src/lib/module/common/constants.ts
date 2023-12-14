@@ -30,6 +30,16 @@ import { userOrderModalOpen} from '$lib/store/user_order/function';
 
 
 let table_data : any;
+
+
+
+
+
+
+
+
+
+
 table_state.subscribe((data : any) => {
     table_data = data;
   })
@@ -76,14 +86,12 @@ const DATA_SELECT_ALERT = {
 
 const MENU = {
     info : [
-        {name: '품목 관리', help: " 품목관리란, 원자재,부자재,반제품,부분품,완제품 등 제품생산 및 출하에 필요한 모든 재료를 말합니다."},
+        {name: '주문 하기', help: "고객이 주문을 하는 메뉴입니다."},
+        {name: '주문 현황', help: "기간별 사용자가 주문한 현황을 확인하는 메뉴입니다."},
+            
+        {name: '마이페이지', help: "사용자의 정보를 수정하는 곳입니다."},
     
-        {name: 'BOM 관리', help: "BOM 관리란, 제품 생산 및 출하에 필요한 모든 원자재/부자재/반제품/부분품 등을 리스트로 관리하여 필요시 생산 및 출하메뉴에서 불러오는 메뉴입니다."},
-        {name: '거래처 관리', help: "업체에서 거래하는 거래처 관리 메뉴입니다. 영업처 또는 제조사가 될 수도 있습니다."},
-        {name: '회원 관리', help: "MES 프로그램을 사용하는 사용자를 관리하는 메뉴입니다."},
-        {name: '창고 관리', help: "원자재,부자재,반제품,부분품,완제품 등을 관리하는 메뉴입니다."},
-        {name: 'Excel 관리', help: "기준정보를 Excel에 작성하여 업로드하기 위한 메뉴입니다."},
-      ],
+    ],
 }
 
 
@@ -308,51 +316,7 @@ const TABLE_HEADER_CONFIG : any = {
         },
     }],
 
-    user : [
-        {formatter:"rowSelection",width : 60, field: "selected", titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, 
-        cellClick:function(e : any, cell:any){
-            cell.getRow().toggleSelect()
-        }},
-        {title:"ID", field:"id", width:150, headerFilter:"input"},
-        {title:"사업자번호", field:"code", width:150, headerFilter:"input",
-        formatter:function(cell : any){
-            var value = cell.getValue();
-        return businessNumber(value);
-         },
-        },
-        {title:"상호명", field:"customer_name", width:150, headerFilter:"input", 
-        formatter:function(cell : any){
-            var value = cell.getValue();
-            
-        return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";
-         },
-
-        cellClick:function(e : any, cell:any){
-            let row = cell.getRow();
-           if(row){
-            userModalOpen(row.getData(),"update");
-           }else{
-          
-           }
-        }
-        },
-        {title:"지정차량", field:"car.name", width:150, headerFilter:"input"},
-        {title:"연락처", field:"phone", width:150, headerFilter:"input", formatter:function(cell : any){
-            var value = cell.getValue();
-        return phoneNumber(value);
-         },},
-  
-        {title:"이메일", field:"email", width:150, headerFilter:"input"},
-        
-        {title:"등록일", field:"created", hozAlign:"center", sorter:"date",  headerFilter:"input", 
-        formatter: function(cell : any, formatterParams: any, onRendered: any) {
-            // Luxon을 사용하여 datetime 값을 date로 변환
-            const datetimeValue = cell.getValue();
-            const date = DateTime.fromISO(datetimeValue).toFormat("yyyy-MM-dd");
-            return date;
-        }},     
-    
-   ],
+   
 
    user_product : [
     {formatter:"rowSelection",width : 60, field: "selected", titleFormatter:"rowSelection", hozAlign:"center", headerSort:true, 
@@ -439,103 +403,46 @@ const TABLE_HEADER_CONFIG : any = {
 ],
 
     user_order_sub_list : [
-        {formatter:"rowSelection",width : 60, field: "selected", titleFormatter:"rowSelection", hozAlign:"center", headerSort:true, 
-        cellClick:function(e : any, cell:any){
-            cell.getRow().toggleSelect();
-            console.log(cell.getRow());
-        }},
-        {title:"ID", field:"uid", width:150, headerFilter:"input"},
-        {title:"분류", field:"type", width:150, headerFilter:"input"},
-      
-        {title:"상품명", field:"name", width:150, headerFilter:"input", 
+       
+        {title:"상품명", field:"name",  
+   
+        tooltip: true, // 특정 열에 대한 툴팁 설정
         formatter:function(cell : any){
             var value = cell.getValue();
-        return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";
+        return "<div style='overflow: visible; white-space:normal;'><span style='color:black; font-weight:bold; '>" + value + "</span></div>";
          },
     
-      
+         
+ 
+
         },
-        {title:"수량", field:"qty", width:150, editor : "input",formatter: "money",  formatterParams: {
+        {title:"수량", field:"qty", editor : "input",formatter: "money",  formatterParams: {
           
             thousand:",",
             precision:false,
 
         },cellEdited: updateSupplyPrice},
-        {title:"단가", field:"price", width:150, editor : "input",formatter: "money",  formatterParams: {
-            
-              thousand:",",
-              symbol:"원",
-            symbolAfter:"p",
-            precision:false,
-        },cellEdited: updateSupplyPrice},
-        {title:"매입단가", field:"buy_price", width:150, editor : "input",formatter: "money",  formatterParams: {
-            
-            thousand:",",
-            symbol:"원",
-          symbolAfter:"p",
-          precision:false,
-      }},
-
-
-        {title:"공급가액", field:"supply_price", width:150, editor : "input",formatter: "money",  formatterParams: {
-           
-            thousand:",",
-            symbol:"원",
-            symbolAfter:"p",
-            precision:false,
-        }},
+       
         
 
     
        ],
 
        user_order_sub: [
-        {formatter:"rowSelection",width : 60, field: "selected", titleFormatter:"rowSelection", hozAlign:"center", headerSort:true, 
-        cellClick:function(e : any, cell:any){
-            cell.getRow().toggleSelect();
-            console.log(cell.getRow());
-        }},
-       
-        {title:"분류", field:"product.type", width:150, headerFilter:"input"},
-      
-        {title:"상품명", field:"product.name", width:150, headerFilter:"input", 
+        {title:"상품명", field:"product.name", headerFilter:"input", 
         formatter:function(cell : any){
             var value = cell.getValue();
-        return "<span style='color:#3FB449; font-weight:bold;'>" + value + "</span>";
-         },
-    
+            return "<div style='overflow: visible; white-space:normal;'><span style='color:black; font-weight:bold; '>" + value + "</span></div>";
+         }
         },
-        {title:"매입처", field:"product.company.name", width:150, headerFilter:"input"},
-        {title:"지정차량", field:"userOrder.car.name", width:150, headerFilter:"input"},
+       
         {title:"수량", field:"qty", width:150, editor : "input",formatter: "money",  formatterParams: {
           
             thousand:",",
             precision:false,
 
         }},
-        {title:"단가", field:"price", width:150, editor : "input",formatter: "money",  formatterParams: {
-            
-              thousand:",",
-              symbol:"원",
-            symbolAfter:"p",
-            precision:false,
-        }},
-        {title:"매입단가", field:"buy_price", width:150, editor : "input",formatter: "money",  formatterParams: {
-            
-            thousand:",",
-            symbol:"원",
-          symbolAfter:"p",
-          precision:false,
-      }},
-
-
-        {title:"공급가액", field:"supply_price", width:150, editor : "input",formatter: "money",  formatterParams: {
-           
-            thousand:",",
-            symbol:"원",
-            symbolAfter:"p",
-            precision:false,
-        }},
+  
         
 
     
@@ -552,9 +459,8 @@ const TABLE_TOTAL_CONFIG : any = {
     layout: "fitDataTable",
     pagination:"local",
   
-    paginationSize:10,
-    paginationSizeSelector:[10, 50, 100,5000],
-
+    paginationSize:500,
+   
     movableColumns:true,
     paginationCounter:"rows",
     paginationAddRow:"table", //add rows relative to the table

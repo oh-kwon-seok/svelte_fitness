@@ -11,7 +11,7 @@
     import Title from '$lib/components/layout/Title.svelte';
     
 
-    import { Tabs, TabItem, Timeline, TimelineItem, Button,ButtonGroup,Dropdown,DropdownItem,Input,Label,Select,Search} from 'flowbite-svelte';
+    import { Tabs, TabItem, Timeline, TimelineItem, Button,ButtonGroup,Dropdown,DropdownItem,Input,Label,Select,Search,Card,Listgroup,Avatar} from 'flowbite-svelte';
     import { ChevronDownSolid, SearchOutline } from 'flowbite-svelte-icons';
 
 
@@ -31,10 +31,10 @@
     import SearchBar from '$lib/components/layout/SearchBar.svelte'
     import Toast from '$lib/components/toast/Toast.svelte'
     
-    import {makeTable,infoCallApi} from '$lib/store/common/function';
+    import {selectCardQuery} from '$lib/store/common/function';
 
     import {userOrderSubexcelDownload} from '$lib/store/user_order_sub/function';
-    
+    import food_url from '$lib/images/food.jpg';
 
 
 	import { afterUpdate, onMount } from 'svelte';
@@ -48,15 +48,14 @@
   
     export let data;
 
- 
-    let tableComponent = "example-table-theme";
+
 
 
     onMount(()=>{
-        console.log('시점');
+     
+      selectCardQuery('user_order_sub');
        
-        makeTable(table_state,"user_order_sub",tableComponent);
-
+      
     });
 
     afterUpdate(()=> {
@@ -64,10 +63,10 @@
         if(data.title === 'redirect'){
             window.location.href = '/';
             alert('잘못된 주소거나 요청시간이 만료되었습니다.');
-        }else if($url_state['path'] === '/user_order'){
+        }else if($url_state['path'] === '/user_order_sub'){
          
-            makeTable(table_state,"user_order_sub",tableComponent);
-        }
+          selectCardQuery('user_order_sub');
+     }
       
     })
      
@@ -77,61 +76,53 @@
 
     </script>
         
-        {#if $common_toast_state['value'] === true}
-         <Toast />
-        {/if}
+        
 
         
      
         <Header />
 
-        <div class="grid grid-rows-16 grid-flow-col gap-1">
-            <div class="row-span-16"> 
-              <SideBar />
-            </div>
-            <div class="col-span-1 row-span-1"> 
-              <Title title='영업 관리' subtitle='매입 관리'/>
-            </div>
+        <Card img={food_url}  class="mb-4 h-screen text-center">
+          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">주문 현황</h5>
+          <SearchBar title="user_order_sub"/>    
 
+
+            {#if $common_user_order_sub_state && $common_user_order_sub_state.length > 0}
+          <Listgroup items={$common_user_order_sub_state} let:item class="border-0 dark:!bg-transparent">
+            <div class="flex items-center space-x-4 rtl:space-x-reverse">
+              <!-- <Avatar src={item.img.src} alt={item.img.alt} class="flex-shrink-0" /> -->
+              <Icon.TruckSolid class='mr-2' size="20" />
+              <div class="flex-1 min-w-0">
+                <p class="whitespace-normal text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {item['product']['name']}
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  {moment(item['created']).format('YY-MM-DD')}
+                </p>
+              </div>
+              <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                {item['qty']}
+              </div>
+            </div>
+          </Listgroup>
+            {:else}
+              <h11>데이터가 존재하지 않습니다. </h11>
           
+          
+          {/if}
+
+
+
+             <Footer />
+        </Card>
+
+      
+                    
+
+                   
+           
+             
             
-            <div class="row-span-15 col-span-12 "> 
-                <Tabs  style="pill" defaultClass=" mt-5 overflow-auto  flex rounded-lg divide-x divide-gray-200 shadow dark:divide-gray-700" >
-                    <TabItem  open >
-                   
-
-                      <span slot="title">매입 관리</span>
-
-                
-                      <SearchBar title="user_order_sub"/>
-
-
-                      <div class='m-5'>
-
-                 
-
-                        <Button  color='green' on:click={() => userOrderSubexcelDownload('user_order_sub',EXCEL_CONFIG['user_order_sub'])}>
-                          <Icon.FileCsvSolid class='mr-2' size="20" />
-                          엑셀다운dd
-                      </Button>
-
-                      
-
-                     
-               
-
-                      </div>
-
-                      <div id="example-table-theme" bind:this={tableComponent}></div>
-                    </TabItem>
-                   
-                  
-          
-                  </Tabs>
-                <Footer />
-            </div>
-         
-          </div>
        
         
         

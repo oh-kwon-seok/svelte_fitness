@@ -15,6 +15,7 @@ import {TOAST_SAMPLE} from '$lib/module/common/constants';
 import { businessNumber,phoneNumber} from '$lib/module/common/function';
 import {TabulatorFull as Tabulator} from 'tabulator-tables';
 import {TABLE_TOTAL_CONFIG,TABLE_HEADER_CONFIG,TABLE_FILTER} from '$lib/module/common/constants';
+import { setCookie, getCookie, removeCookie } from '$lib/cookies';
 
 const api = import.meta.env.VITE_API_BASE_URL;
 
@@ -30,6 +31,7 @@ let search_state : any;
 let login_data : any;
 let table_data : any;
 let user_data : any;
+
 let selected_data : any;
 
 
@@ -87,11 +89,11 @@ common_user_state.subscribe((data) => {
 
 
 
-const userOrderModalOpen = (data : any, title : any) => {
- console.log('data : ', data);
 
-  console.log('title : ', title);
-  
+
+
+const userOrderModalOpen = (data : any, title : any) => {
+ 
     alert['type'] = 'save';
     alert['value'] = false;
     
@@ -101,6 +103,7 @@ const userOrderModalOpen = (data : any, title : any) => {
     user_order_modal_state.update(() => update_modal);
 
     console.log('update_modal : ', update_modal);
+   
 
     if(title === 'add'){
       user_order_form_state.update(() => init_form_data);
@@ -183,20 +186,35 @@ const select_query = (type) => {
 
 const save = (param,title) => {
 
+  let user_uid = getCookie('my-cookie');
+  let car_uid;
+  let car_data = user_data.filter(item => {
+    return user_uid === item.id; 
+  })
+
+ 
+  if(car_data){
+    car_uid = car_data[0]['car']['uid'];
+  }else{
+    return console.log('차량이 정해지지 않았습니다.관리자에게 문의하십시오.');
+  }
+
+
 
   update_modal['title'] = 'add';
   update_modal['add']['use'] = true;
  
     if(title === 'add'){
       console.log('param : ', param);
-      let data = table_data['user_order_sub'].getSelectedData();
+      let data = table_data['user_order_sub_list'].getSelectedData();
 
       let checked_data = data.filter(item => {
         return parseInt(item.qty) > 0 && item.qty !== undefined 
       })
 
+      
     
-      if( param['user'] === '' || param['car'] === '' || checked_data.length === 0 || checked_data.length === undefined ){
+      if( param['user'] === '' || checked_data.length === 0 || checked_data.length === undefined ){
         //return common_toast_state.update(() => TOAST_SAMPLE['fail']);
         alert['type'] = 'save';
         alert['value'] = true;
@@ -212,10 +230,10 @@ const save = (param,title) => {
           
           let params = {
             
-            order_status : param.order_status,
-            price_status : param.price_status,
-            user_id : param.user,
-            car_uid : param.car,
+            order_status : '주문완료',
+            price_status : '미수금',
+            user_id : user_uid,
+            car_uid : car_uid,
             used : param.used,
             auth : 'user',
             user_order_sub : checked_data,
@@ -226,17 +244,14 @@ const save = (param,title) => {
         ).then(res => {
           console.log('res',res);
           if(res.data !== undefined && res.data !== null && res.data !== '' ){
-            console.log('실행');
-            console.log('res:data', res.data);
-            
+          
             toast['type'] = 'success';
             toast['value'] = true;
             update_modal['title'] = '';
             update_modal['add']['use'] = !update_modal['add']['use'];
             user_order_modal_state.update(() => update_modal);
-            select_query('user_order');
-            
-
+    
+    
             return common_toast_state.update(() => toast);
 
           }else{
@@ -377,7 +392,7 @@ const save = (param,title) => {
     console.log('update : ', update_modal['title']);
     console.log('update : ', update_modal['title']);
     
-
+    let user_id = getCookie('my-cookie');
 
     const url = `${api}/product/select`; 
 
@@ -413,13 +428,13 @@ const save = (param,title) => {
         }
 
         if(res.data.length > 0){
-          let product_data = res.data;
+        
           let url;
           let params;
           update_modal['title']
           if(update_modal['title'] === 'add'){
             url = `${api}/user_product/info_select`;
-            params = { user_id : update_form.user};
+            params = { user_id : user_id};
 
           }
           if(update_modal['title'] === 'update'){
@@ -438,51 +453,28 @@ const save = (param,title) => {
             axios.get(url,config).then(res=>{
               
               let user_order_checked_data =  res.data;
-          
-
-              for(let i=0; i < product_data.length; i++){
-                let product_uid = product_data[i]['uid'];
-
-                for(let j=0; j< user_order_checked_data.length; j++){
-                  let user_order_checked_uid = user_order_checked_data[j]['product']['uid'];
-                  if(product_uid === user_order_checked_uid){
-                    checked_data.push(product_uid);
-                    product_data[i]['selected'] = true; 
-                    if(update_modal['title'] === 'add'){
-                      product_data[i]['qty'] = user_order_checked_data[j]['qty'].toString(); 
-                   
-                    }else if(update_modal['title'] === 'update'){
-                      product_data[i]['qty'] = user_order_checked_data[j]['qty'].toString(); 
-                      product_data[i]['price'] = user_order_checked_data[j]['price'].toString();
-                      product_data[i]['supply_price'] = user_order_checked_data[j]['supply_price'].toString();
-                      product_data[i]['buy_price'] = user_order_checked_data[j]['buy_price'].toString();
-                      
-                       
-                      
-                    }
               
-                    user_order_checked_data.splice(j,1);
-                    break;
-                  }
-
-                }
-
-
-              }
-
-              console.log('product_data',product_data);
             
-              // table_data['user_order_sub'].setData(res.data);
-              // table_state.update(() => table_data);
+              for(let i=0; i < user_order_checked_data.length; i++){
+                user_order_checked_data[i]['uid'] = user_order_checked_data[i]['product']['uid'];
+                user_order_checked_data[i]['name'] = user_order_checked_data[i]['product']['name'];
+                user_order_checked_data[i]['qty'] = 0;
+                user_order_checked_data[i]['price'] = 0;
+                user_order_checked_data[i]['buy_price'] = 0;
+                user_order_checked_data[i]['supply_price'] = 0;
+                
+                
+                
+              }
+             
               table_data['user_order_sub_list'] =   new Tabulator(tableComponent, {
-                height:"40vh",
-                layout:TABLE_TOTAL_CONFIG['layout'],
-                pagination:TABLE_TOTAL_CONFIG['pagination'],
-                paginationSize:1000,
-                paginationSizeSelector:[10, 50, 100,1000,5000],
+                tooltips: true, // 전역 설정: 모든 열에 툴팁 적용
+                
+              
+            
+                height:"50vh",
+                layout:"fitColumns",
                 movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
-                paginationCounter: TABLE_TOTAL_CONFIG['paginationCounter'],
-                paginationAddRow:TABLE_TOTAL_CONFIG['paginationAddRow'], //add rows relative to the table
                 locale: TABLE_TOTAL_CONFIG['locale'],
                 langs: TABLE_TOTAL_CONFIG['langs'],
                 selectable: true,
@@ -508,15 +500,9 @@ const save = (param,title) => {
                   console.log("Updated Data:", updatedData);
                   // 여기에서 데이터를 처리하면 됩니다.
               },
-             
-             
-      
-                data : product_data,
-              
+                data : user_order_checked_data,
                 columns: TABLE_HEADER_CONFIG['user_order_sub_list'],
                 
-           
-               
                 });
                 table_state.update(()=> table_data);
              
@@ -534,12 +520,7 @@ const save = (param,title) => {
       table_data['user_order_sub'] =   new Tabulator(tableComponent, {
         height:"25vh",
         layout:TABLE_TOTAL_CONFIG['layout'],
-        pagination:TABLE_TOTAL_CONFIG['pagination'],
-        paginationSize:TABLE_TOTAL_CONFIG['paginationSize'],
-        paginationSizeSelector:TABLE_TOTAL_CONFIG['paginationSizeSelector'],
         movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
-        paginationCounter: TABLE_TOTAL_CONFIG['paginationCounter'],
-        paginationAddRow:TABLE_TOTAL_CONFIG['paginationAddRow'], //add rows relative to the table
         locale: TABLE_TOTAL_CONFIG['locale'],
         langs: TABLE_TOTAL_CONFIG['langs'],
         selectable: true,
@@ -573,7 +554,26 @@ const save = (param,title) => {
     
 }
 
+const userOrderFileUpload = (e) => {
+  const file = e.target.files[0];
+    if (file) {
+      // 이미지 파일이 선택된 경우 처리
+      const reader = new FileReader();
 
+      
+
+      reader.onload = (e) => {
+        update_form['selectedImage'] = e.target.result;
+        console.log('result : ', e.target.result);
+
+        user_order_form_state.update(()=> update_form);
+      };
+      
+      
+      
+      reader.readAsDataURL(file);
+    }
+}
 
 
 const userTable = (table_state,type,tableComponent) => {
@@ -666,4 +666,4 @@ const userTable = (table_state,type,tableComponent) => {
 }
 
 
-export {userOrderModalOpen,save,userTable,userOrderSubTable}
+export {userOrderModalOpen,save,userTable,userOrderSubTable,userOrderFileUpload}

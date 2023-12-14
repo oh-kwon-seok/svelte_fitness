@@ -1,19 +1,21 @@
 
 
 <script lang="ts">
-    // @ts-nocheck
+	// @ts-nocheck
     import '../../app.postcss';
     
 
     import Header from '$lib/components/layout/Header.svelte';
     import SideBar from '$lib/components/layout/SideBar.svelte';
     import Footer from '$lib/components/layout/Footer.svelte';
-    import Title from '$lib/components/layout/Title.svelte';
     
-    import SaleChart from './SaleChart.svelte';
-    import { Tabs, TabItem, Timeline, TimelineItem, Button } from 'flowbite-svelte';
+	import food_url from '$lib/images/food.jpg';
 
+    
 
+    import { Tabs, TabItem, Timeline, TimelineItem, Button,Popover ,Card } from 'flowbite-svelte';
+
+    import Util from '$lib/components/modal/user_order/Util.svelte';
 
 
     import NotFound from '$lib/components/error/404.svelte';
@@ -22,7 +24,8 @@
 
     import {url_state,cookie_state,common_product_state,table_state} from '$lib/store/common/state';
     import {makeTable,infoCallApi} from '$lib/store/common/function';
-    
+
+    import {userOrderModalOpen} from '$lib/store/user_order/function';
 
 	import { afterUpdate, onMount } from 'svelte';
 
@@ -36,36 +39,10 @@
   
     export let data;
   
+    import {user_order_modal_state} from '$lib/store/user_order/state';
 
-
-    let status;
-  
-    let tableComponent = "example-table-theme";
-    
 
    
-    onMount(()=>{
-        console.log('시점');
-       
-        makeTable(table_state,"product",tableComponent);
-
-    });
-   
-    afterUpdate(()=> {
-
-        if(data.title === 'redirect'){
-            console.log('cookie_state',cookie_state);
-            console.log('data : ', data);
-            window.location.href = '/';
-            alert('잘못된 주소거나 요청시간이 만료되었습니다.');
-        }else if($url_state['path'] === '/home'){
-            status = 'on';
-          
-            
-        }
-        console.log('status : ', status);
-
-    })
 
     </script>
     
@@ -75,59 +52,32 @@
 
         <Header />
       
-        <div class="grid grid-rows-1 grid-flow-col gap-2">
-            <div class="row-span-3 "> <SideBar />
-              
-    
-            </div>
-          
-            
-            
-            
-            <div class="col-span-1 ">
-               
-
-                <Tabs style="full" defaultClass="mt-5 flex rounded-lg divide-x divide-gray-200 shadow dark:divide-gray-700">
-                    <TabItem class="w-full" open>
-                    <span slot="title">매출현황</span>
-                    <p class="text-sm text-gray-500 dark:text-gray-400"><b>매출현황:</b> 전년대비 금년도 매출현황입니다.</p>
-                        <!-- <SaleChart /> -->
-                     
-
-                    </TabItem>
-                   
-
-                    <TabItem class="w-full" >
-                        <span slot="title">생산현황</span>
-                        <p class="text-sm text-gray-500 dark:text-gray-400"><b>생산현황:</b>현재 생산현황입니다.</p>
-                        <SaleChart />
-                    </TabItem>
-                    <TabItem class="w-full" >
-                        <span slot="title">출하현황</span>
-                        <p class="text-sm text-gray-500 dark:text-gray-400"><b>출하현황:</b>현재 출하현황입니다.</p>
-                        <SaleChart />
-                    </TabItem>
-                </Tabs>
-               
-                <Footer />
-            </div>
-
-
         
-
+      
           
-       
+            
+          <Card img={food_url}  class="mb-4 h-screen text-center">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">식자재 유통 서비스</h5>
+            <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">아래 버튼으로 확인할 수 있습니다.</p>
+              <Button on:click={() => {userOrderModalOpen('','add')}}>
+                주문하기
+              </Button>
+              <Button on:click={() => window.location.href = '/sale/user_order_sub'}>
+                주문현황
+              </Button >
+               <Footer />
+          </Card>
+
+                  {#if $user_order_modal_state['title'] === 'add'}
+                  <Util title="add" />
+                {:else if $user_order_modal_state['title'] === 'update'}
+                  <Util  title="update"/>
+                  {:else if $user_order_modal_state['title'] === 'check_delete'}
+                  <Util  title="check_delete"/>
+                {/if}
+
+
+
                 
-      </div>
-
-     
-
-
-
-
-       
-       
-        
-        
-    
-    
+            
+          

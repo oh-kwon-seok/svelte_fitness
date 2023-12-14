@@ -8,10 +8,11 @@
 	import Loading from '$lib/components/button/Loading.svelte';
 	
 	import {LOGIN_ALERT} from '$lib/module/common/constants';
-	import src_url from '$lib/images/sea.jpeg';
+	import src_url from '$lib/images/fruit.jpg';
 	import {common_alert_state,login_state, load_state} from '$lib/store/common/state';
 
 	import {onChangeHandler,loadChange,tokenChange} from '$lib/store/common/function';
+
 
 
 	import { setCookie, getCookie, removeCookie } from '$lib/cookies';
@@ -22,13 +23,26 @@
 
 
 
-
 	
+	
+
+	let login_data : any;
+
+
+	login_state.subscribe((data:any) => {
+  		login_data = data;
+
+	});
+
+
+
 	const clientId = import.meta.env.NAVER_CLIENT_ID
 	const callbackUrl = '/api/sign-in/naver-login'
 	
 	let kakaoClientId = '2713d0b777a1e2fbfaf1b0cd5aa224f4'; // 여기에 본인의 Kakao 클라이언트 ID를 입력하세요.
   	let kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=http://localhost:5173/home&response_type=code`;
+
+
 
 
 
@@ -48,19 +62,18 @@
 
 
 
-	const login = async(e : any) => {
+	const login = (e : any) => {
+	
+
 		loadChange(true);
 		$common_alert_state = {type : 'login', value : false};
 		
-	
+		
 		const url = `/api/user/sign-in`
-
 		try {
-			await performAsyncTask();
+			// await performAsyncTask();
 
 			let params = $login_state;
-
-		
 				const config = {
 				headers:{
 					"Content-Type": "application/json",
@@ -69,7 +82,7 @@
 			}
 
 
-		await axios.post(url,
+		axios.post(url,
 			params,config
 		).then(res => {
 		
@@ -78,10 +91,26 @@
 			if(res.data['success'] === true){
 					// 	// 쿠키 설정
 
+				console.log('$login_state',$login_state);
+
 				setCookie('my-cookie', $login_state['id'], { expires: 3600 });
+				
+				
+				
+
+				// login_state.update((currentState:any) => {
+				// 	const newState = { ...currentState, id: $login_state['id'],
+				// 	token : res.data['token'],
+				// };
+				// 	login_data = newState; // login_data에도 저장
+				// 	return newState; // 업데이트된 상태 반환
+				// });
+				
+
 				tokenChange(res.data['token']);
 
-		
+
+	
 				window.location.href = '/home';
 			
 			}else if(res.data['success'] === false){
@@ -101,7 +130,17 @@
 			
 		}
 
+
+		login_data['id'] = $login_state['id'];
+				login_state.update(() => login_data);
+				
+
 	}
+
+
+
+
+
 
 
 
@@ -137,6 +176,7 @@
             cursor: pointer;
             padding: 0;
 			width : 50%;
+			margin: 5px;
         }
 		</style>
 		<div class="flex justify-center items-center ">
@@ -145,34 +185,39 @@
 				<h3 class="text-xl font-medium text-gray-700 dark:text-white p-0 w-80">장안유통 식자재유통서비스</h3>
 				<Label class="space-y-2">
 					<span>ID</span>
-					<Input   type="text" name="id" placeholder="ID를 입력하세요" required vind:value={$login_state.id} on:change={(e)=> onChangeHandler(e)} />
+					<Input   type="text" name="id" placeholder="ID를 입력하세요" required bind:value={$login_state['id']} />
 				</Label>
 				<Label class="space-y-2 justify-center">
 					<span>Password</span>
-					<Input  type="password" name="password" placeholder="•••••" required vind:value={$login_state.password} on:change={(e)=> onChangeHandler(e)}/>
+					<Input  type="password" name="password" placeholder="•••••" required bind:value={$login_state['password']} />
 				</Label>
 				<div class="flex items-start">
 					<Checkbox>자동 저장</Checkbox>
 					
 				</div>
 				{#if $load_state === false}
-					<Button  type="submit" class="w-full" on:click={(e) => login(e)} >Login</Button>
+					<Button  type="submit" class="w-full" on:click={(e) => login(e)} >로그인</Button>
 				{:else if $load_state === true}
 					<Loading />
 				{/if}
 
-				<button class="image-button" on:click={() => handleKakaoLogin()} >
-					<!-- svelte-ignore a11y-img-redundant-alt -->
-					<img alt="The project logo" src={naver_login_button} />
-				</button>
+				<div style="display:flex; flex-direction:row; ">
+					<button class="image-button" on:click={() => handleKakaoLogin()} >
+						<!-- svelte-ignore a11y-img-redundant-alt -->
+						<img alt="The project logo" src={naver_login_button} />
+					</button>
+	
+					<button class="image-button" on:click={onKakaoLogin}>
+						<img
+							src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg"
+							width="222"
+							alt="카카오 로그인 버튼"
+						/>
+					</button>
 
-				<button on:click={onKakaoLogin}>
-					<img
-						src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg"
-						width="222"
-						alt="카카오 로그인 버튼"
-					/>
-				</button>
+
+				</div>
+				
 				
 			</form>
 		{#if $common_alert_state['type'] === 'login' && $common_alert_state['value'] === true}

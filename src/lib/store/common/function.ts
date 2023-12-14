@@ -15,6 +15,7 @@ import moment from 'moment';
 
 
 import {TabulatorFull as Tabulator} from 'tabulator-tables';
+import { getCookie } from '$lib/cookies';
 
 
 const api = import.meta.env.VITE_API_BASE_URL;
@@ -115,6 +116,8 @@ common_user_order_sub_state.subscribe((data : any) => {
 
 
 
+
+
 const infoCallApi = (title) => {
 
  
@@ -210,12 +213,22 @@ const onChangeHandler = (e) => {
   login_state.update(()=> login_data);
 
   }
+
+  
+
+
+
+
   const tokenChange = (token) => {
     
     login_data['token'] = token;
+    console.log('tocken',token);
+
+    console.log(' login_data', login_data);
+
     login_state.update(()=> login_data);
   
-    console.log(login_data);
+   
     }
 
 
@@ -470,10 +483,6 @@ const excelDownload = (type,config) => {
 
           }
            
-
-           
-
-          
           });
           // item_data.update(() => list_data);
           search_data['filteredItems'] = list_data;
@@ -572,17 +581,20 @@ const excelDownload = (type,config) => {
         const url = `${api}/${type}/select`; 
               
         search_data['filter'] = TABLE_FILTER[type];
+
+   
         
         common_search_state.update(() => search_data);
 
-        let start_date = moment(search_data['start_date']).format('YYYY-MM-DDTHH:mm:ss');
+        let start_date = moment(search_data['start_date']).startOf('month').format('YYYY-MM-DDTHH:mm:ss');
 
-        let end_date = moment(search_data['end_date']).format('YYYY-MM-DDTHH:mm:ss');
+        let end_date = moment(search_data['start_date']).endOf('month').format('YYYY-MM-DDTHH:mm:ss');
         let search_text = search_data['search_text'];
         let filter_title = search_data['filter_title'];
         
 
-        
+        console.log('start_date',start_date);     
+        console.log('end_date',end_date);     
 
         let params = 
         {
@@ -611,6 +623,10 @@ const excelDownload = (type,config) => {
          })
       
       }
+
+
+
+
 
 
 
@@ -754,6 +770,54 @@ const excelDownload = (type,config) => {
 
 
 
+    const selectCardQuery = (type) => {
+      let user_id = getCookie('my-cookie');
+      const url = `${api}/${type}/mobile_select`; 
+            
+      search_data['filter'] = TABLE_FILTER[type];
+
+ 
+      
+      common_search_state.update(() => search_data);
+
+      let start_date = moment(search_data['start_date']).startOf('month').format('YYYY-MM-DDTHH:mm:ss');
+
+      let end_date = moment(search_data['start_date']).endOf('month').format('YYYY-MM-DDTHH:mm:ss');
+      let search_text = search_data['search_text'];
+      let filter_title = search_data['filter_title'];
+      
+
+      console.log('start_date',start_date);     
+      console.log('end_date',end_date);     
+
+      let params = 
+      {
+        start_date : start_date,
+        end_date  : end_date,
+        search_text : search_text,
+        filter_title : filter_title,   
+        user_id : user_id,
+      };
+      const config = {
+        params : params,
+        headers:{
+          "Content-Type": "application/json",
+          
+        }
+      }
+        axios.get(url,config).then(res=>{
+         
+          console.log('res : ',res);
+          user_order_sub_data = res.data;
+
+          common_user_order_sub_state.update(() => user_order_sub_data);
+         
+       })
+    
+    }
+
+
+
 
 
 
@@ -781,5 +845,7 @@ export {handleToggle,
   makeTable,
   tokenChange,
   select_query,
+  selectCardQuery,
+  
 
 }

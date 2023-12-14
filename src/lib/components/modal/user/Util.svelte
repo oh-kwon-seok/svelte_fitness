@@ -43,17 +43,6 @@
 
     let color = title === 'add' || title === 'update'   ? 'blue' : 'red'; 
 
-    let tableComponent = "example-table-theme";
-
-
-      onMount(()=>{
-        userProductTable(table_state,"user_product",tableComponent);
-      });
-
-      afterUpdate(()=> {
-        userProductTable(table_state,"user_product",tableComponent);
-  
-      })
 
     </script>
 
@@ -65,18 +54,13 @@
         <form action="#">
           {#if title === 'add' || title === 'update'}
    
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4">
           
-          {#if $user_modal_state['title'] === 'add'}
+        
           <Label class="space-y-2">
-            <span>사업자번호 {businessNumber($user_form_state.code)}</span>
-            <Input maxlength="10" type="text" placeholder="사업자번호를 입력하세요" required bind:value={$user_form_state['code']} on:input={businessNumber($user_form_state.code)}/>
-            
-            {#if $user_form_state['code'] === '' && $common_alert_state['value'] === true}
-            <Helper class="mt-2" color="red"><span class="font-medium">데이터를 입력해주세요</span></Helper>
-            {/if}
+            <span>사업자번호 {businessNumber($user_form_state.code)}</span>  
           </Label>
-          {/if}
+       
 
 
           <Label class="space-y-2">
@@ -98,19 +82,6 @@
           </Label>
 
           
-
-          <!-- 사업장 ID는 사업자등록번호로 연결시켜놓음 -->
-          {#if $user_modal_state['title'] === 'add'}
-          <Label class="space-y-2"> 
-            <span>ID</span>
-            <Input type="text" id="id" readOnly placeholder="ID를 입력하세요" required bind:value={$user_form_state['code']}/>
-
-            {#if $user_form_state['code'] === '' && $common_alert_state['value'] === true}
-            <Helper class="mt-2" color="red"><span class="font-medium">데이터를 입력해주세요</span></Helper>
-            {/if}
-          </Label>
-          {/if}
-
               <!-- 사업장 ID는 사업자등록번호로 연결시켜놓음 -->
               
               {#if $user_modal_state['title'] === 'add'}
@@ -142,68 +113,14 @@
               </Label>
 
 
-
-          <Label class="space-y-2">
-            <span>지정차량</span>
-            <Select id="countrie" class="mt-2" bind:value={$user_form_state['car']} placeholder="">
-                {#each $common_car_state as item}
-                  <option value={item.uid}>{item.name}</option>
-                {/each}
-              </Select>
-          </Label>
-       
-
-          
-
-          {#if $user_modal_state['title'] === 'update'}
-            <Label class="space-y-2">
-              <span>사용유무</span>
-              <Select id="countries" class="mt-2" bind:value={$user_form_state['used']} placeholder="">
-                    <option value={0}>{"사용안함"}</option>
-                    <option value={1}>{"사용"}</option>
-
-                </Select>
-            </Label>
-          {/if}
+      
           </div>
          
 
-          <div class="grid grid-cols-1 gap-4">
-                <Hr class="my-8 bg-slate-300 "  height="h-1"></Hr>
-                <p class="mb-4 font-semibold text-xl dark:text-white">취급품목</p>
-          </div>
-
         
 
-            <div id="example-table-theme" bind:this={tableComponent}></div>
-         
-        
-       
 
-
-<!-- 
-          <div class="grid grid-cols-6 gap-4">
-            <P class="col-span-3 text-bold" align='center'>BOM 리스트</P>
-            <Button color="blue" class="gap-4" on:click={() => bomRowUtil('add')}>
-              행추가
-              
-              
-              <Indicator color="none" class="bg-red-500 text-xs text-primary-800 font-semibold" size="lg">{$info_item_form_state['child'].length > 0 ? $info_item_form_state['child'].length : 0}</Indicator>
-            
-            </Button>
-            <Button color="red" class="gap-4" on:click={() => bomRowUtil('check_delete')}>
-              선택삭제
-             </Button>
-             <Button color="red" class="gap-4" on:click={() => bomRowUtil('delete')}>
-              행삭제
-             </Button>
-          </div> -->
-
-
-
-          <!-- {#if $common_toast_state['value'] === true}
-          <Toast />
-         {/if} -->
+  
 
          {#if $common_alert_state['type'] === 'save' && $common_alert_state['value'] === true}
             

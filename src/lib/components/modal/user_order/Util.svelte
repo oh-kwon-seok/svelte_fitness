@@ -2,31 +2,35 @@
 <script>
 
     // @ts-nocheck
-    import { Hr, Button ,Modal, Label, Select, Input, Helper} from 'flowbite-svelte'
+    import { Hr, Button ,Modal, Label, Select, Input, Helper,Card} from 'flowbite-svelte'
     
     import * as Icon from 'svelte-awesome-icons';
     
     import Toast from '$lib/components/toast/Toast.svelte';
     import Alert from '$lib/components/alert/Alert.svelte';
     import {user_order_modal_state, user_order_form_state} from '$lib/store/user_order/state';
-    import {common_alert_state, common_toast_state,common_car_state,table_state} from '$lib/store/common/state';
+    import {common_alert_state, common_toast_state,common_car_state,table_state, login_state} from '$lib/store/common/state';
+    import { setCookie, getCookie, removeCookie } from '$lib/cookies';
+
+    import {save,userOrderSubTable,userTable,userOrderFileUpload} from '$lib/store/user_order/function';
     
-    import {save,userOrderSubTable,userTable} from '$lib/store/user_order/function';
+    
+    import {fileButtonClick} from '$lib/store/common/function';
+
+
     import {DATA_FAIL_ALERT,DATA_SELECT_ALERT} from '$lib/module/common/constants';
     
     import {onMount,afterUpdate } from 'svelte';
     export let title;
 
 
-
-  
     console.log('title',title);
     
     let label_title = '';
    
    
     if(title === 'add'){
-      label_title = '추가';
+      label_title = '저장';
     }else if(title === 'update'){
       label_title = '수정';
     }else if(title === 'delete'){
@@ -36,20 +40,24 @@
     }
 
     let color = title === 'add' || title === 'update' ? 'blue' : 'red'; 
-    let tableComponent = "example-table-theme";
+ 
     let tableComponent1 = "example-table-theme1";
 
     onMount(()=>{
-        
-      userTable(table_state,"user",tableComponent);
 
-   
+      
+
+       
+      if(getCookie('my-cookie') !== ''){
+         
+         userOrderSubTable(table_state,"user_order_sub",tableComponent1);
+       }
+
       });
 
       afterUpdate(()=> {
-        userTable(table_state,"user",tableComponent);
       
-        if($user_order_form_state['user'] !== ''){
+        if(getCookie('my-cookie') !== ''){
          
           userOrderSubTable(table_state,"user_order_sub",tableComponent1);
         }
@@ -59,7 +67,15 @@
 
     </script>
 
- 
+
+<style>
+  /* 셀 내부 텍스트가 잘리지 않도록 스타일 조절 */
+  .tabulator-table .tabulator-cell {
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+</style>
+    
 
     <Modal title={`주문 ${label_title}`} color={color} bind:open={$user_order_modal_state[title]['use']} size="xl" placement={title === 'add' || title === 'check_delete'  ? 'center' : 'center-right'}   class="w-full">
        
@@ -67,91 +83,29 @@
         <form action="#">
           {#if title === 'add' || title === 'update'}
           
-
-          {#if title==='add'}
-            <div id="example-table-theme" bind:this={tableComponent}></div>
-          {/if}
-         
-
-
-
-          <div class="grid grid-cols-2 gap-4">
-     
-
-        
-         
-       
-          <Label class="space-y-2">
-            <span>계정</span>
-            <Input type="text" readOnly  id="last_name" placeholder="업체룰 선택하세요" required bind:value={$user_order_form_state['user']}/>
-            
-            {#if $user_order_form_state['user'] === '' && $common_alert_state['user'] === true}
-            <Helper class="mt-2" color="red"><span class="font-medium">업체를 선택해주세요</span></Helper>
-            {/if}
-          </Label>
-
-          <Label class="space-y-2">
-            <span>지정차량</span>
-
-            <Select id="countrie" class="mt-2" bind:value={$user_order_form_state['car']} placeholder="">
-              
-              
-                {#each $common_car_state as item}
-                  <option value={item.uid}>{item.name}</option>
-                {/each}
-              </Select>
-          </Label>
-
-          <Label class="space-y-2">
-            <span>주문상태</span>
-            <Select id="countrie" class="mt-2" bind:value={$user_order_form_state['order_status']} placeholder="">
-              
-              
-                  <option value={'주문완료'}>주문완료</option>
-                  <option value={'주문확인'}>주문확인</option>
-                  <option value={'주문취소'}>주문취소</option>
-                  <option value={'납품완료'}>납품완료</option>
-                  
-               
-              </Select>
-          </Label>
-
-          
-          <Label class="space-y-2">
-            <span>수금 상태</span>
-            <Select id="countrie" class="mt-2" bind:value={$user_order_form_state['price_status']} placeholder="">
-              
-                  <option value={'미수금'}>미수금</option>
-                  <option value={'부분수금'}>부분수금</option>
-                  <option value={'수금완료'}>수금완료</option>
-              
-              </Select>
-          </Label>
-    
-         
-          
-          {#if $user_order_modal_state['title'] === 'update'}
-            <Label class="space-y-2">
-              <span>사용유무</span>
-              <Select id="countries" class="mt-2" bind:value={$user_order_form_state['used']} placeholder="">
-                    <option value={0}>{"사용안함"}</option>
-                    <option value={1}>{"사용"}</option>
-
-                </Select>
-            </Label>
-          {/if}
-          </div>
-         
-
-          <div class="grid grid-cols-1 gap-4">
-                <Hr class="my-8 bg-slate-300 "  height="h-1"></Hr>
-                <p class="mb-4 font-semibold text-xl dark:text-white">주문 목록</p>
-          </div>
-
-         
-
           <div id="example-table-theme1" bind:this={tableComponent1}></div>
 
+          <div class='m-5 text-center'>
+          <Button  color='blue' on:click={(e)=> fileButtonClick('upload')}>
+            <Icon.FileImageSolid class='mr-2' size="20" />
+              사진으로 주문하기
+            <input 
+            hidden  
+            id = 'upload' 
+            type='file' 
+            accept="image/*"
+            on:change={(e)=> userOrderFileUpload(e)}
+            />
+        </Button>
+
+          {#if $user_order_form_state['selectedImage']}
+            <!-- svelte-ignore a11y-img-redundant-alt -->
+            <img style="max-width: 100%;max-height: 300px;margin-top: 10px;" src={$user_order_form_state['selectedImage']} alt="Selected Image" />
+
+          
+
+            {/if}
+        </div>
 
 
          {#if $common_alert_state['type'] === 'save' && $common_alert_state['value'] === true}

@@ -24,6 +24,7 @@ import {v4 as uuid} from 'uuid';
     order_status : '주문완료',
     car : '',
     used : 1,
+    selectedImage : '',
     
   })
   
