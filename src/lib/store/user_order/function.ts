@@ -37,15 +37,13 @@ let selected_data : any;
 
 let init_form_data = {
   uid : 0,
-  id : '',
-  code : '',
-  customer_name : '',
-  name : '',
-  email : '',
-  phone : '',
-  password : '1111',
+  user : '',
+
+  price_status : '미수금',
+  order_status : '주문완료',
   car : '',
   used : 1,
+  selectedImage : '',
 
 }
 
@@ -185,6 +183,7 @@ const select_query = (type) => {
 }
 
 const save = (param,title) => {
+  
 
   let user_uid = getCookie('my-cookie');
   let car_uid;
@@ -200,6 +199,7 @@ const save = (param,title) => {
   }
 
 
+  console.log('param : ', param);
 
   update_modal['title'] = 'add';
   update_modal['add']['use'] = true;
@@ -214,7 +214,7 @@ const save = (param,title) => {
 
       
     
-      if( param['user'] === '' || checked_data.length === 0 || checked_data.length === undefined ){
+      if( car_uid === '' || (checked_data.length === 0 &&  param['selectedImage']==='')){
         //return common_toast_state.update(() => TOAST_SAMPLE['fail']);
         alert['type'] = 'save';
         alert['value'] = true;
@@ -235,6 +235,7 @@ const save = (param,title) => {
             user_id : user_uid,
             car_uid : car_uid,
             used : param.used,
+            image_url : param['selectedImage'],  
             auth : 'user',
             user_order_sub : checked_data,
             token : login_data['token'],
@@ -564,7 +565,7 @@ const userOrderFileUpload = (e) => {
 
       reader.onload = (e) => {
         update_form['selectedImage'] = e.target.result;
-        console.log('result : ', e.target.result);
+       
 
         user_order_form_state.update(()=> update_form);
       };
