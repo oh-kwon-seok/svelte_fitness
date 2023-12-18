@@ -33,7 +33,7 @@
     // import {TabulatorFull as Tabulator} from 'tabulator-tables';
     import * as Icon from 'svelte-awesome-icons';
     
-    import 'tabulator-tables-css'; // CSS 파일이 import됩니다.
+
 	import moment from 'moment';
 
   
@@ -45,17 +45,17 @@
    
 
     </script>
+        <style>
+          @import 'tabulator-tables/dist/css/tabulator_modern.min.css';
+       
+          /* 나머지 스타일 정의 */
+        </style>
     
-
-   
 
 
         <Header />
       
         
-      
-          
-            
           <Card img={food_url}  class="mb-4 h-screen text-center">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">식자재 유통 서비스</h5>
             <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">아래 버튼으로 확인할 수 있습니다.</p>

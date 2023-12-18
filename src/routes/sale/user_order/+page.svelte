@@ -26,6 +26,9 @@
     import {user_order_form_state,user_order_modal_state} from '$lib/store/user_order/state';
 
     import {url_state,cookie_state,common_user_order_state,table_state,common_toast_state,common_search_state} from '$lib/store/common/state';
+    
+    
+    
     import {TABLE_COMPONENT,EXCEL_CONFIG} from '$lib/module/common/constants';
 
     import SearchBar from '$lib/components/layout/SearchBar.svelte'
@@ -39,7 +42,7 @@
   
     // import {TabulatorFull as Tabulator} from 'tabulator-tables';
 
-    import 'tabulator-tables-css'; // CSS 파일이 import됩니다.
+
 	import moment from 'moment';
             
   
@@ -73,6 +76,12 @@
  
 
     </script>
+        <style>
+          @import 'tabulator-tables/dist/css/tabulator_modern.min.css';
+       
+          /* 나머지 스타일 정의 */
+        </style>
+        
         
         {#if $common_toast_state['value'] === true}
          <Toast />
