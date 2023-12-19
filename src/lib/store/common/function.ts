@@ -770,22 +770,28 @@ const excelDownload = (type,config) => {
 
 
 
-    const selectCardQuery = (type) => {
+    const selectCardQuery = (type,select) => {
       let user_id = getCookie('my-cookie');
-      const url = `${api}/${type}/mobile_select`; 
+      const url = `${api}/${type}/${select}`; 
             
       search_data['filter'] = TABLE_FILTER[type];
 
- 
-      
-      common_search_state.update(() => search_data);
 
+      console.log('test : 5455',search_data);
+  
+      
+  
+
+     
       let start_date = moment(search_data['start_date']).startOf('month').format('YYYY-MM-DDTHH:mm:ss');
 
       let end_date = moment(search_data['start_date']).endOf('month').format('YYYY-MM-DDTHH:mm:ss');
       let search_text = search_data['search_text'];
       let filter_title = search_data['filter_title'];
       
+      
+     
+      common_search_state.update(() => search_data);
 
       console.log('start_date',start_date);     
       console.log('end_date',end_date);     

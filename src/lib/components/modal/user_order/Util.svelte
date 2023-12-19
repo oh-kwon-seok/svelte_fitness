@@ -12,7 +12,7 @@
     import {common_alert_state, common_toast_state,common_car_state,table_state, login_state} from '$lib/store/common/state';
     import { setCookie, getCookie, removeCookie } from '$lib/cookies';
 
-    import {save,userOrderSubTable,userTable,userOrderFileUpload} from '$lib/store/user_order/function';
+    import {save,userOrderSubTable,userTable,userOrderFileUpload,tempSave} from '$lib/store/user_order/function';
     
     
     import {fileButtonClick} from '$lib/store/common/function';
@@ -68,13 +68,7 @@
     </script>
 
 
-<style>
-  /* 셀 내부 텍스트가 잘리지 않도록 스타일 조절 */
-  .tabulator-table .tabulator-cell {
-    white-space: normal !important;
-    overflow: visible !important;
-  }
-</style>
+
     
 
     <Modal title={`주문 ${label_title}`} color={color} bind:open={$user_order_modal_state[title]['use']} size="xl" placement={title === 'add' || title === 'check_delete'  ? 'center' : 'center-right'}   class="w-full">
@@ -88,7 +82,7 @@
           <div class='m-5 text-center'>
           <Button  color='blue' on:click={(e)=> fileButtonClick('upload')}>
             <Icon.FileImageSolid class='mr-2' size="20" />
-              사진으로 주문하기
+              사진으로 주문
             <input 
             hidden  
             id = 'upload' 
@@ -97,15 +91,22 @@
             on:change={(e)=> userOrderFileUpload(e)}
             />
         </Button>
+        <Button  color='green' on:click={tempSave($user_order_form_state,title)}>
+          <Icon.BasketShoppingSolid class='mr-2' size="20" />
+          장바구니        
+        </Button>
 
-          {#if $user_order_form_state['selectedImage']}
-            <!-- svelte-ignore a11y-img-redundant-alt -->
-            <img style="max-width: 100%;max-height: 300px;margin-top: 10px;" src={$user_order_form_state['selectedImage']} alt="Selected Image" />
 
-          
+        
+        {#if $user_order_form_state['selectedImage']}
+        <!-- svelte-ignore a11y-img-redundant-alt -->
+        <img style="max-width: 100%;max-height: 300px;margin-top: 10px;" src={$user_order_form_state['selectedImage']} alt="Selected Image" />
 
-            {/if}
-        </div>
+      
+
+        {/if}
+    </div>
+
 
 
          {#if $common_alert_state['type'] === 'save' && $common_alert_state['value'] === true}

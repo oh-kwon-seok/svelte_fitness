@@ -36,6 +36,16 @@
             
             <NavLi href="/home">주문하기</NavLi>
             <NavLi href="/sale/user_order_sub">주문현황</NavLi>
+
+
+            <NavLi href="/sale/user_temp_order">장바구니 조회</NavLi>
+
+            
+            <NavLi href="/sale/user_read_product">최근 본 상품 조회</NavLi>
+
+            <NavLi href="/sale/user_buy_product">자주 구매한 상품 조회</NavLi>
+        
+            
             <NavLi on:click={() => userModalOpen()}>내정보 수정</NavLi>
 
 

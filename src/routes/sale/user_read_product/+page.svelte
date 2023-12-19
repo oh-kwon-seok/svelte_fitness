@@ -63,7 +63,7 @@
         if(data.title === 'redirect'){
             window.location.href = '/';
             alert('잘못된 주소거나 요청시간이 만료되었습니다.');
-        }else if($url_state['path'] === '/user_order_sub'){
+        }else if($url_state['path'] === '/user_read_product'){
          
           selectCardQuery('user_order_sub','mobile_select');
      }
@@ -89,31 +89,24 @@
         <Header />
 
         <Card img={food_url}  class="mb-4 h-screen text-center">
-          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">주문 현황</h5>
-          <SearchBar title="user_order_sub" label="주문일자"/>    
+          <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">최근 본 상품</h5>
+          <SearchBar title="user_order_sub" label="검색일자"/>    
 
 
             {#if $common_user_order_sub_state && $common_user_order_sub_state.length > 0}
           <Listgroup items={$common_user_order_sub_state} let:item class="border-0 dark:!bg-transparent">
             <div class="flex items-center space-x-4 rtl:space-x-reverse">
               <!-- <Avatar src={item.img.src} alt={item.img.alt} class="flex-shrink-0" /> -->
-              <Icon.TruckSolid class='mr-2' size="20" />
+              <!-- <Icon.TruckSolid class='mr-2' size="20" /> -->
               <div class="flex-1 min-w-0">
                 <p class="whitespace-normal text-sm font-medium text-gray-900 truncate dark:text-white">
-                  {item['product']['name']}
+                  {"["+item['product']['type'] + "] " + item['product']['name']}
                 </p>
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                  {moment(item['created']).format('YY-MM-DD')} 
-                  {item['userOrder'] ?  "[" +item['userOrder']['order_status'] + "]" : ""}
-                  {item['userOrder'] ?  "[" +item['userOrder']['price_status'] + "]" : ""}
-                  
-
-
+                  {moment(item['created']).format('YY-MM-DD HH:mm:ss')}
                 </p>
               </div>
-              <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                {item['qty']}
-              </div>
+             
             </div>
           </Listgroup>
             {:else}

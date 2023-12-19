@@ -388,6 +388,95 @@ const save = (param,title) => {
   }
 
 
+
+  const tempSave = (param,title) => {
+  
+
+    let user_uid = getCookie('my-cookie');
+    let car_uid;
+    let car_data = user_data.filter(item => {
+      return user_uid === item.id; 
+    })
+  
+   
+    if(car_data){
+      car_uid = car_data[0]['car']['uid'];
+    }else{
+      return console.log('차량이 정해지지 않았습니다.관리자에게 문의하십시오.');
+    }
+  
+  
+    console.log('param : ', param);
+  
+    update_modal['title'] = 'add';
+    update_modal['add']['use'] = true;
+   
+      if(title === 'add'){
+        console.log('param : ', param);
+        let data = table_data['user_order_sub_list'].getSelectedData();
+  
+        let checked_data = data.filter(item => {
+          return parseInt(item.qty) > 0 && item.qty !== undefined 
+        })
+  
+        
+      
+        if( car_uid === '' || (checked_data.length === 0 )){
+          //return common_toast_state.update(() => TOAST_SAMPLE['fail']);
+          alert['type'] = 'save';
+          alert['value'] = true;
+          user_order_modal_state.update(() => update_modal);
+   
+          return common_alert_state.update(() => alert);
+    
+        }else {
+        
+          const url = `${api}/user_temp_order/save`
+          try {
+    
+            
+            let params = {
+              
+              order_status : '장바구니',
+              user_id : user_uid,
+              car_uid : car_uid,
+              used : param.used,
+              auth : 'user',
+              user_temp_order_sub : checked_data,
+              token : login_data['token'],
+            };
+          axios.post(url,
+            params,
+          ).then(res => {
+            console.log('res',res);
+            if(res.data !== undefined && res.data !== null && res.data !== '' ){
+            
+              toast['type'] = 'success';
+              toast['value'] = true;
+              update_modal['title'] = '';
+              update_modal['add']['use'] = !update_modal['add']['use'];
+              user_order_modal_state.update(() => update_modal);
+      
+      
+              return common_toast_state.update(() => toast);
+  
+            }else{
+            
+              return common_toast_state.update(() => TOAST_SAMPLE['fail']);
+            }
+          })
+          }catch (e:any){
+            return console.log('에러 : ',e);
+          };
+        }
+  
+  
+      
+      }
+      
+    }
+
+
   const userOrderSubTable = (table_state,type,tableComponent) => {
 
     console.log('update : ', update_modal['title']);
@@ -667,4 +756,4 @@ const userTable = (table_state,type,tableComponent) => {
 }
 
 
-export {userOrderModalOpen,save,userTable,userOrderSubTable,userOrderFileUpload}
+export {userOrderModalOpen,save,userTable,userOrderSubTable,userOrderFileUpload,tempSave}
