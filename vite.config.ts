@@ -27,7 +27,7 @@ export default defineConfig({
 	plugins: [sveltekit()],
   
 	server: {
-		port : 3001,
+		port : 3000,
 	  proxy: {
 		'/api': {
 		  target: 'http://localhost:8081',
@@ -37,6 +37,6 @@ export default defineConfig({
 	  },
 	},
 	preview: {
-		port: 3001, // 모바일 포트
+		port: 3000, // 모바일 포트
 	},
   });

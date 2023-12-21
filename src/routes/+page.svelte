@@ -2,7 +2,7 @@
 
 <script lang="ts">
 	
-	import { Button, Label, Input, Checkbox, Card, Spinner} from 'flowbite-svelte'
+	import { Button, Label, Input, Checkbox, Card, Spinner, Modal} from 'flowbite-svelte'
 	import axios from 'axios'
 	import Alert from '$lib/components/alert/Alert.svelte';
 	import Loading from '$lib/components/button/Loading.svelte';
@@ -12,7 +12,7 @@
 	import {common_alert_state,login_state, load_state} from '$lib/store/common/state';
 
 	import {onChangeHandler,loadChange,tokenChange} from '$lib/store/common/function';
-
+	import { businessNumber,phoneNumber} from '$lib/module/common/function';
 
 
 	import { setCookie, getCookie, removeCookie } from '$lib/cookies';
@@ -21,7 +21,11 @@
 	import naver_login_button from '$lib/images/naver_login_white.png';
 	import { onMount } from 'svelte';
 
+	let open = false; // 비밀번호 찾기 상태
 
+	let code = ""; // 비밀번호 찾기 상태
+	let phone = ""; // 비밀번호 찾기 상태
+	
 
 	
 	
@@ -69,7 +73,7 @@
 		$common_alert_state = {type : 'login', value : false};
 		
 		
-		const url = `/api/user/sign-in`
+		const url = `http://localhost:8081/user/sign-in`
 		try {
 			// await performAsyncTask();
 
@@ -139,46 +143,125 @@
 
 
 
+	const passwordInitSend = () => {
+	
+
+	const url = `http://localhost:8081/user/password_init`
+	try {
+		// await performAsyncTask();
+
+		let params = { code : code, phone : phone} 
+
+		console.log('params : ',params);
+			const config = {
+			headers:{
+				"Content-Type": "application/json",
+			}
+		}
+	axios.post(url,
+		params,config
+	).then(res => {
+	
+
+	
+		if(res.data['success'] === true){
+			
+			alert('비밀번호가 초기화되었습니다.');			
+			open = false;
+		
+		}else if(res.data['success'] === false){
+			
+			alert('입력하신 정보로 회원정보가 조회되지 않습니다.');			
+			
+			
+		}		
+	}
+)
+	
+	}catch (e : any){
+		alert(`다음과 같은 에러가 발생했습니다 : ${e.name} : ${e.message}`);
+	} finally {
+		
+	}
+
+
+	// login_data['id'] = $login_state['id'];
+	// login_state.update(() => login_data);
+			
+
+	}
+	
+</script>
+
+	<style>
+		.image-button {
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0;
+		width : 50%;
+		margin: 5px;
+	}
+	</style>
+
+		
+	<Modal title={`비밀번호 초기화`}  bind:open={open} size="xl" placement={'center'}   class="w-full">
+		
+		<!-- grid grid-cols-2 gap-4 -->
+	<form action="#">
+		
+
+	<div class="grid grid-cols-1 gap-4">
+		
+	
+
+
+		<Label class="space-y-2">
+			<span>사업자번호 {businessNumber(code)}</span>
+			<Input maxlength="11" type="text" placeholder="사업자번호를 입력하세요" required bind:value={code} />
+		  </Label>
 
 
 
 
+		<Label class="space-y-2">
+			<span>연락처 {phoneNumber(phone)}</span>
+			<Input maxlength="11" type="text" placeholder="연락처를 입력하세요" required bind:value={phone} />
+		  </Label>
 
-	const performAsyncTask = () => {
-    return new Promise((resolve : any, reject : any) => {
-      // 비동기 작업을 수행하는 함수를 정의합니다.
-      // 실제 작업을 수행하는 로직을 여기에 추가합니다.
-      // 예시로 2초 후에 작업이 완료되었다고 가정합니다.
-      setTimeout(() => {
-        // 비동기 작업이 완료되면 resolve를 호출하여 성공을 알립니다.
-        resolve();
-        // 예시로 강제로 예외를 발생시킵니다.
-        // reject(new Error("비동기 작업 중 예외 발생"));
-      }, 2000);
-    });
-  }
-
-
-
-
-
-
+	
 
 
 	
-  
+			<!-- 사업장 ID는 사업자등록번호로 연결시켜놓음 -->
+			
+			
 
-</script>
-		<style>
-		    .image-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-			width : 50%;
-			margin: 5px;
-        }
-		</style>
+		</div>
+	
+
+
+		<div class="grid grid-cols-6 gap-4">
+		
+		</div>
+		
+
+	
+
+
+	</form>
+	
+	<Button   class="w-full" on:click={() => passwordInitSend()}>비밀번호 초기화 요청</Button>
+
+
+</Modal>
+
+		
+
+
+
+
+
 		<div class="flex justify-center items-center ">
 		<Card class="w-full mt-16 "  padding='xl' img={src_url}   reverse={false} horizontal>	
 		<form class="flex flex-col space-y-6" >
@@ -191,15 +274,18 @@
 					<span>Password</span>
 					<Input  type="password" name="password" placeholder="•••••" required bind:value={$login_state['password']} />
 				</Label>
-				<div class="flex items-start">
+				<!-- <div class="flex items-start">
 					<Checkbox>자동 저장</Checkbox>
 					
-				</div>
+				</div> -->
 				{#if $load_state === false}
 					<Button  type="submit" class="w-full" on:click={(e) => login(e)} >로그인</Button>
 				{:else if $load_state === true}
 					<Loading />
 				{/if}
+
+				<Button color="light"  class="w-full" on:click={() => open=true} >비밀번호 초기화</Button>
+
 
 				<div style="display:flex; flex-direction:row; ">
 					<button class="image-button" on:click={() => handleKakaoLogin()} >
