@@ -12,13 +12,15 @@
 	import {common_alert_state,login_state, load_state} from '$lib/store/common/state';
 
 	import {onChangeHandler,loadChange,tokenChange} from '$lib/store/common/function';
-	import { businessNumber,phoneNumber} from '$lib/module/common/function';
+	import { businessNumber,phoneNumber,generateRandomString} from '$lib/module/common/function';
 
 
 	import { setCookie, getCookie, removeCookie } from '$lib/cookies';
 	import naver from 'naver-id-login'
 
 	import naver_login_button from '$lib/images/naver_login_white.png';
+
+
 	import { onMount } from 'svelte';
 
 	let open = false; // 비밀번호 찾기 상태
@@ -27,8 +29,23 @@
 	let phone = ""; // 비밀번호 찾기 상태
 	
 
-	
-	
+
+
+
+// TextEncoder 인스턴스 생성
+const textEncoder = new TextEncoder();
+
+// 문자열을 Uint8Array로 변환
+const uint8Array:any = textEncoder.encode(generateRandomString(32));
+
+const binaryString = String.fromCharCode.apply(null, uint8Array);
+
+// 문자열을 Base64로 인코딩
+const naver_state = btoa(binaryString);
+
+console.log("Base64 Encoded String:", naver_state);
+
+
 
 	let login_data : any;
 
@@ -40,29 +57,65 @@
 
 
 
-	const clientId = import.meta.env.NAVER_CLIENT_ID
-	const callbackUrl = '/api/sign-in/naver-login'
+	const NaverClientId = import.meta.env.VITE_NAVER_CLIENT_ID
+
 	
-	let kakaoClientId = '2713d0b777a1e2fbfaf1b0cd5aa224f4'; // 여기에 본인의 Kakao 클라이언트 ID를 입력하세요.
-  	let kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=http://localhost:5173/home&response_type=code`;
+	//let kakaoClientId = '2713d0b777a1e2fbfaf1b0cd5aa224f4'; // 여기에 본인의 Kakao 클라이언트 ID를 입력하세요.
+	let kakaoClientId = import.meta.env.VITE_KAKAO_CLIENT_ID; // 여기에 본인의 Kakao 클라이언트 ID를 입력하세요.
+	
+	
+
+
+
+  	let kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=http://localhost:3000/home&response_type=code`;
+
+	let naverAuthURL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${NaverClientId}&state=test&redirect_uri=http://localhost:8081/auth/naver`;
+
+
+
+	let authUrl : any;
+	onMount(async () => {
+		try {
+		// 백엔드에서 네이버 로그인 URL을 가져오는 엔드포인트로 요청을 보냅니다.
+		const response = await axios.get("http://localhost:8081/auth/naver_login");
+		authUrl = response.data.authUrl;
+		console.log('authUrl : ', authUrl);
+		} catch (error) {
+		console.error("Error fetching Naver login URL:", error);
+		}
+  	});
 
 
 
 
-
-	function handleKakaoLogin() {
+	function onKakaoLogin() {
     	window.location.href = kakaoAuthURL;
   }
 
+  function onNaverLogin() {
+	console.log('authUrl : ', authUrl);
+    	window.location.href = authUrl;
+  }
 
 
-  function onKakaoLogin() {
-		// 카카오 로그인 버튼을 눌렀을 때 동작하는 함수
-		Kakao.Auth.authorize({
-			redirectUri: 'http://localhost:5173/home' // 카카오 로그인 후 리다이렉트 될 주소
-			
-		});
-	}
+	// const onNaverLogin = () => {
+	// 	console.log('naverAuthURL : ', naverAuthURL);
+  
+	// 	const popup = window.open(
+	// 		naverAuthURL,
+	// 	"네이버 로그인",
+	// 	"width=600,height=800"
+	// 	);
+	
+	// 	const checkPopup = setInterval(() => {
+	// 	if (popup?.closed) {
+	// 		clearInterval(checkPopup);
+	// 		// 팝업이 닫힌 후의 처리 (예: 토큰 처리 등)
+	// 	}else{
+
+	// 	}
+	// 	}, 1000);
+	// };
 
 
 
@@ -102,13 +155,13 @@
 				
 				
 
-				// login_state.update((currentState:any) => {
-				// 	const newState = { ...currentState, id: $login_state['id'],
-				// 	token : res.data['token'],
-				// };
-				// 	login_data = newState; // login_data에도 저장
-				// 	return newState; // 업데이트된 상태 반환
-				// });
+				login_state.update((currentState:any) => {
+					const newState = { ...currentState, id: $login_state['id'],
+					token : res.data['token'],
+				};
+					login_data = newState; // login_data에도 저장
+					return newState; // 업데이트된 상태 반환
+				});
 				
 
 				tokenChange(res.data['token']);
@@ -208,7 +261,7 @@
 	<Modal title={`비밀번호 초기화`}  bind:open={open} size="xl" placement={'center'}   class="w-full">
 		
 		<!-- grid grid-cols-2 gap-4 -->
-	<form action="#">
+	<form action="#" method="POST">
 		
 
 	<div class="grid grid-cols-1 gap-4">
@@ -264,7 +317,7 @@
 
 		<div class="flex justify-center items-center ">
 		<Card class="w-full mt-16 "  padding='xl' img={src_url}   reverse={false} horizontal>	
-		<form class="flex flex-col space-y-6" >
+		<form method="POST" action="#" class="flex flex-col space-y-6" >
 				<h3 class="text-xl font-medium text-gray-700 dark:text-white p-0 w-80">장안유통 식자재유통서비스</h3>
 				<Label class="space-y-2">
 					<span>ID</span>
@@ -288,24 +341,28 @@
 
 
 				<div style="display:flex; flex-direction:row; ">
-					<button class="image-button" on:click={() => handleKakaoLogin()} >
+					<button class="image-button" on:click={() => onKakaoLogin()} >
 						<!-- svelte-ignore a11y-img-redundant-alt -->
-						<img alt="The project logo" src={naver_login_button} />
+						<img alt="카카오 로그인 버튼" src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg" />
 					</button>
-	
-					<button class="image-button" on:click={onKakaoLogin}>
+					<button class="image-button" on:click={()=>onNaverLogin()}>
 						<img
-							src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg"
-							width="222"
-							alt="카카오 로그인 버튼"
+						src={naver_login_button}
+							
+						
+							alt="네이버 로그인 버튼"
 						/>
 					</button>
+	
+				
 
 
 				</div>
 				
 				
 			</form>
+		
+
 		{#if $common_alert_state['type'] === 'login' && $common_alert_state['value'] === true}
 			<div class="mt-12">
 				<Alert state={'login'} color='red' title={LOGIN_ALERT.title} content={LOGIN_ALERT.content} />

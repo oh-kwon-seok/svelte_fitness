@@ -48,7 +48,7 @@
 
  
 
-    <Modal title={`회원 ${label_title}`} color={color} bind:open={$user_modal_state[title]['use']} size="xl" placement={title === 'add' || title === 'check_delete'  ? 'center' : 'center-right'}   class="w-full">
+    <Modal title={`비밀번호 초기화 신청`} color={color} bind:open={$user_modal_state[title]['use']} size="xl" placement={title === 'add' || title === 'check_delete'  ? 'center' : 'center-right'}   class="w-full">
        
           <!-- grid grid-cols-2 gap-4 -->
         <form action="#">

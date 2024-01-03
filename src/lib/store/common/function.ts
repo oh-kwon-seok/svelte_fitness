@@ -51,6 +51,18 @@ let user_order_sub_data : any;
 const workbook = new Excel.Workbook();
 
 
+const int_login_data : any = {
+  user_idx : "",
+  id : "",
+  name : "",
+  password : "",
+  token :"",
+
+  status : false,
+  
+};
+
+
 
 common_alert_state.subscribe((data : any) => {
   alert_data = data;
@@ -183,6 +195,26 @@ const changeUrl = (obj) => {
 
 
   }
+
+  const logout = () => {
+    var confirmLogout = confirm("로그아웃하시겠습니까?");
+
+    if (confirmLogout) {
+        // 여기에 로그아웃 로직을 추가하세요.
+        login_data = int_login_data;
+        window.location.href="http://localhost:3000";
+        login_state.update(()=> login_data);
+    
+    } else {
+        // 사용자가 '취소'를 선택한 경우
+      
+    }
+
+    
+
+  
+  
+    }
 
 
 
@@ -634,10 +666,6 @@ const excelDownload = (type,config) => {
       const makeTable = (table_state,type,tableComponent) => {
 
 
-        console.log(table_state);
-        console.log(type);
-        console.log(tableComponent);
-        
         const url = `${api}/${type}/select`; 
         
         search_data['filter'] = TABLE_FILTER[type];
@@ -852,6 +880,6 @@ export {handleToggle,
   tokenChange,
   select_query,
   selectCardQuery,
-  
+  logout,
 
 }

@@ -5,10 +5,17 @@
 	import { Navbar, NavBrand, NavHamburger, NavUl, NavLi, Chevron, MegaMenu   } from 'flowbite-svelte'
   import {MENU} from '$lib/module/common/constants'
 	import { userModalOpen } from '$lib/store/user/function';
-    
+  import { logout } from '$lib/store/common/function';
+  
+  
+  import {login_state} from '$lib/store/common/state';
+  
   import {user_form_state,user_modal_state} from '$lib/store/user/state';
   import Util from '$lib/components/modal/user/Util.svelte';
 
+
+
+ 
   
   let styles = {
     nav_link_style : '',
@@ -47,6 +54,8 @@
         
             
             <NavLi on:click={() => userModalOpen()}>내정보 수정</NavLi>
+            <NavLi on:click={() => logout()}>로그아웃</NavLi>
+            
 
 
           </NavUl>
