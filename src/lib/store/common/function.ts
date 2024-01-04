@@ -19,6 +19,8 @@ import { getCookie } from '$lib/cookies';
 
 
 const api = import.meta.env.VITE_API_BASE_URL;
+const client_url = import.meta.env.VITE_CLIENT_BASE_URL;
+
 
 
 
@@ -51,7 +53,7 @@ let user_order_sub_data : any;
 const workbook = new Excel.Workbook();
 
 
-const int_login_data : any = {
+const init_login_data : any = {
   user_idx : "",
   id : "",
   name : "",
@@ -201,8 +203,8 @@ const changeUrl = (obj) => {
 
     if (confirmLogout) {
         // 여기에 로그아웃 로직을 추가하세요.
-        login_data = int_login_data;
-        window.location.href="http://localhost:3000";
+        login_data = init_login_data;
+        window.location.href = client_url;
         login_state.update(()=> login_data);
     
     } else {

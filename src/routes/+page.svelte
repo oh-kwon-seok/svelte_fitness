@@ -22,6 +22,10 @@
 
 
 	import { onMount } from 'svelte';
+	const api = import.meta.env.VITE_API_BASE_URL;
+
+	const client_url = import.meta.env.VITE_CLIENT_BASE_URL;
+	
 
 	let open = false; // 비밀번호 찾기 상태
 
@@ -67,17 +71,14 @@ console.log("Base64 Encoded String:", naver_state);
 
 
 
-  	let kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=http://localhost:3000/home&response_type=code`;
-
-	let naverAuthURL = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${NaverClientId}&state=test&redirect_uri=http://localhost:8081/auth/naver`;
-
+  	let kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoClientId}&redirect_uri=${client_url}/home&response_type=code`;
 
 
 	let authUrl : any;
 	onMount(async () => {
 		try {
 		// 백엔드에서 네이버 로그인 URL을 가져오는 엔드포인트로 요청을 보냅니다.
-		const response = await axios.get("http://localhost:8081/auth/naver_login");
+		const response = await axios.get(`${api}/auth/naver_login`);
 		authUrl = response.data.authUrl;
 		console.log('authUrl : ', authUrl);
 		} catch (error) {
@@ -98,26 +99,6 @@ console.log("Base64 Encoded String:", naver_state);
   }
 
 
-	// const onNaverLogin = () => {
-	// 	console.log('naverAuthURL : ', naverAuthURL);
-  
-	// 	const popup = window.open(
-	// 		naverAuthURL,
-	// 	"네이버 로그인",
-	// 	"width=600,height=800"
-	// 	);
-	
-	// 	const checkPopup = setInterval(() => {
-	// 	if (popup?.closed) {
-	// 		clearInterval(checkPopup);
-	// 		// 팝업이 닫힌 후의 처리 (예: 토큰 처리 등)
-	// 	}else{
-
-	// 	}
-	// 	}, 1000);
-	// };
-
-
 
 	const login = (e : any) => {
 	
@@ -126,7 +107,7 @@ console.log("Base64 Encoded String:", naver_state);
 		$common_alert_state = {type : 'login', value : false};
 		
 		
-		const url = `http://localhost:8081/user/sign-in`
+		const url = `${api}/user/sign-in`
 		try {
 			// await performAsyncTask();
 
@@ -199,7 +180,7 @@ console.log("Base64 Encoded String:", naver_state);
 	const passwordInitSend = () => {
 	
 
-	const url = `http://localhost:8081/user/password_init`
+	const url = `${api}/user/password_init`
 	try {
 		// await performAsyncTask();
 
