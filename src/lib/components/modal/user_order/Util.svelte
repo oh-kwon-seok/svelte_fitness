@@ -79,8 +79,8 @@
           
           <div id="example-table-theme1" bind:this={tableComponent1}></div>
 
-          <div class='m-5 text-center'>
-          <Button  color='blue' on:click={(e)=> fileButtonClick('upload')}>
+          <div class='mt-5 text-center'>
+          <Button  class="w-full" color='blue' on:click={(e)=> fileButtonClick('upload')}>
             <Icon.FileImageSolid class='mr-2' size="20" />
               사진으로 주문
             <input 
@@ -91,10 +91,7 @@
             on:change={(e)=> userOrderFileUpload(e)}
             />
         </Button>
-        <Button  color='green' on:click={tempSave($user_order_form_state,title)}>
-          <Icon.BasketShoppingSolid class='mr-2' size="20" />
-          장바구니        
-        </Button>
+      
 
 
         
@@ -146,7 +143,19 @@
         
         </svelte:fragment> -->
         <Button  color={title === 'add' || title === 'update'  ? 'blue' : 'red'}   class="w-full" on:click={save($user_order_form_state,title)}>{label_title}</Button>
+        
+
+        {#if title === 'add'}
+
+          <Button  class="w-full" color='green' on:click={tempSave($user_order_form_state,title)}>
+            <Icon.BasketShoppingSolid class='mr-2' size="20" />
+            장바구니
+          </Button>
+        {/if}
+
        
+
+
        
         {#if $common_alert_state['type'] === 'save' && $common_alert_state['value'] === true}
      

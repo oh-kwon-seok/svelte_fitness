@@ -13,7 +13,7 @@
   import {user_form_state,user_modal_state} from '$lib/store/user/state';
   import Util from '$lib/components/modal/user/Util.svelte';
 
-
+  import logo from '$lib/images/jangan_logo.png';
 
  
   
@@ -33,7 +33,8 @@
 
 	<Navbar let:hidden let:toggle rounded >
         <NavBrand href="/">
-            <img src="https://flowbite.com/docs/images/logo.svg" class="mr-3 h-6 sm:h-9" alt="Flowbite Logo"/>
+            <img src={logo} class="mr-3 h-12 sm:h-9" alt="Food Logo"/>
+
             <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">장안유통</span>
         </NavBrand>
 

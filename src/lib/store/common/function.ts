@@ -15,7 +15,7 @@ import moment from 'moment';
 
 
 import {TabulatorFull as Tabulator} from 'tabulator-tables';
-import { getCookie } from '$lib/cookies';
+import { getCookie,removeCookie } from '$lib/cookies';
 
 
 const api = import.meta.env.VITE_API_BASE_URL;
@@ -204,7 +204,15 @@ const changeUrl = (obj) => {
     if (confirmLogout) {
         // 여기에 로그아웃 로직을 추가하세요.
         login_data = init_login_data;
+        
+        removeCookie('my-cookie');
+        removeCookie('password');
+        removeCookie('autoSave');
+        
+   
+        
         window.location.href = client_url;
+
         login_state.update(()=> login_data);
     
     } else {

@@ -32,7 +32,7 @@
 	let code = ""; // 비밀번호 찾기 상태
 	let phone = ""; // 비밀번호 찾기 상태
 	
-
+	let autoSave : any = false; // 자동저장유무
 
 
 
@@ -46,10 +46,6 @@ const binaryString = String.fromCharCode.apply(null, uint8Array);
 
 // 문자열을 Base64로 인코딩
 const naver_state = btoa(binaryString);
-
-console.log("Base64 Encoded String:", naver_state);
-
-
 
 	let login_data : any;
 
@@ -80,10 +76,26 @@ console.log("Base64 Encoded String:", naver_state);
 		// 백엔드에서 네이버 로그인 URL을 가져오는 엔드포인트로 요청을 보냅니다.
 		const response = await axios.get(`${api}/auth/naver_login`);
 		authUrl = response.data.authUrl;
-		console.log('authUrl : ', authUrl);
+	
 		} catch (error) {
-		console.error("Error fetching Naver login URL:", error);
+	
 		}
+		const storedUsername = getCookie('my-cookie');
+		const storedPassword = getCookie('password');
+		const storedAutoSave = getCookie('autoSave');
+		
+	
+		if(storedUsername){
+			$login_state['id'] = storedUsername;
+		}
+		if(storedPassword){
+			$login_state['password'] = storedPassword;
+		}
+		if(storedAutoSave){
+			autoSave = storedAutoSave === 'true'; // 쿠키는 문자열로 저장되므로 boolean으로 변환
+		}
+	
+
   	});
 
 
@@ -94,13 +106,13 @@ console.log("Base64 Encoded String:", naver_state);
   }
 
   function onNaverLogin() {
-	console.log('authUrl : ', authUrl);
+
     	window.location.href = authUrl;
   }
 
 
 
-	const login = (e : any) => {
+	const login = async(e : any) => {
 	
 
 		loadChange(true);
@@ -109,7 +121,7 @@ console.log("Base64 Encoded String:", naver_state);
 		
 		const url = `${api}/user/sign-in`
 		try {
-			// await performAsyncTask();
+			await performAsyncTask();
 
 			let params = $login_state;
 				const config = {
@@ -127,15 +139,15 @@ console.log("Base64 Encoded String:", naver_state);
 
 		
 			if(res.data['success'] === true){
-					// 	// 쿠키 설정
+					// 	쿠키 설정
+				setCookie('my-cookie', $login_state['id'], { expires: 21 * 24 * 60 * 60  });
+				if(autoSave === true){
+					setCookie('my-cookie', $login_state['id'], { expires: 21 * 24 * 60 * 60  });
+					setCookie('password', $login_state['password'], { expires: 21 * 24 * 60 * 60  });
+					setCookie('autoSave', autoSave, { expires: 21 * 24 * 60 * 60 }); // 21일 보관
 
-				console.log('$login_state',$login_state);
-
-				setCookie('my-cookie', $login_state['id'], { expires: 3600 });
+				}
 				
-				
-				
-
 				login_state.update((currentState:any) => {
 					const newState = { ...currentState, id: $login_state['id'],
 					token : res.data['token'],
@@ -153,9 +165,15 @@ console.log("Base64 Encoded String:", naver_state);
 			
 			}else if(res.data['success'] === false){
 				
+				console.log('document.body.scrollHeight : ', document.body.scrollHeight);
 				
-				
+								
 				$common_alert_state = {type : 'login', value : true};
+
+				window.scrollTo({
+					top: document.body.scrollHeight,
+					behavior: 'smooth' // 부드러운 스크롤을 위해 'smooth' 옵션을 추가
+					});
 			}		
 		}
 			
@@ -174,6 +192,22 @@ console.log("Base64 Encoded String:", naver_state);
 				
 
 	}
+
+	const performAsyncTask = () => {
+    return new Promise((resolve : any, reject : any) => {
+      // 비동기 작업을 수행하는 함수를 정의합니다.
+      // 실제 작업을 수행하는 로직을 여기에 추가합니다.
+      // 예시로 2초 후에 작업이 완료되었다고 가정합니다.
+      setTimeout(() => {
+        // 비동기 작업이 완료되면 resolve를 호출하여 성공을 알립니다.
+        resolve();
+        // 예시로 강제로 예외를 발생시킵니다.
+        // reject(new Error("비동기 작업 중 예외 발생"));
+      }, 2000);
+    });
+  }
+
+
 
 
 
@@ -219,8 +253,7 @@ console.log("Base64 Encoded String:", naver_state);
 	}
 
 
-	// login_data['id'] = $login_state['id'];
-	// login_state.update(() => login_data);
+	
 			
 
 	}
@@ -242,7 +275,7 @@ console.log("Base64 Encoded String:", naver_state);
 	<Modal title={`비밀번호 초기화`}  bind:open={open} size="xl" placement={'center'}   class="w-full">
 		
 		<!-- grid grid-cols-2 gap-4 -->
-	<form action="#" method="POST">
+	<form >
 		
 
 	<div class="grid grid-cols-1 gap-4">
@@ -297,26 +330,35 @@ console.log("Base64 Encoded String:", naver_state);
 
 
 		<div class="flex justify-center items-center ">
-		<Card class="w-full mt-16 "  padding='xl' img={src_url}   reverse={false} horizontal>	
-		<form method="POST" action="#" class="flex flex-col space-y-6" >
-				<h3 class="text-xl font-medium text-gray-700 dark:text-white p-0 w-80">장안유통 식자재유통서비스</h3>
+		<Card class="w-full "   img={src_url}   reverse={false} horizontal>	
+		<form class="flex flex-col space-y-6" >
+				<h3 class="text-xl font-medium text-gray-700 dark:text-white p-0 w-80">신선식품 유통서비스</h3>
 				<Label class="space-y-2">
 					<span>ID</span>
 					<Input   type="text" name="id" placeholder="ID를 입력하세요" required bind:value={$login_state['id']} />
 				</Label>
 				<Label class="space-y-2 justify-center">
 					<span>Password</span>
-					<Input  type="password" name="password" placeholder="•••••" required bind:value={$login_state['password']} />
+					<Input  type="password" name="password" placeholder="비밀번호를 입력하세요" required bind:value={$login_state['password']} />
 				</Label>
-				<!-- <div class="flex items-start">
-					<Checkbox>자동 저장</Checkbox>
+				<div class="flex items-start">
+					<Checkbox bind:checked={autoSave}>자동 저장</Checkbox>
 					
-				</div> -->
+				</div>
 				{#if $load_state === false}
 					<Button  type="submit" class="w-full" on:click={(e) => login(e)} >로그인</Button>
 				{:else if $load_state === true}
 					<Loading />
 				{/if}
+
+
+				{#if $common_alert_state['type'] === 'login' && $common_alert_state['value'] === true}
+				<div class="mt-12">
+					<Alert state={'login'} color='red' title={LOGIN_ALERT.title} content={LOGIN_ALERT.content} />
+				</div>
+				{/if}
+
+
 
 				<Button color="light"  class="w-full" on:click={() => open=true} >비밀번호 초기화</Button>
 
@@ -344,11 +386,7 @@ console.log("Base64 Encoded String:", naver_state);
 			</form>
 		
 
-		{#if $common_alert_state['type'] === 'login' && $common_alert_state['value'] === true}
-			<div class="mt-12">
-				<Alert state={'login'} color='red' title={LOGIN_ALERT.title} content={LOGIN_ALERT.content} />
-			</div>
-		{/if}
+	
 
 
 	</Card>

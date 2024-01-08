@@ -109,7 +109,7 @@
               <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
                 {item['qty']}
               </div>
-              <div on:click={(e)=> console.log('gggg')}><Icon.TrashSolid class='mr-2' size="20" /></div>
+              <div ><Icon.TrashSolid class='mr-2' size="20" /></div>
       
 
               

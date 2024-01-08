@@ -103,6 +103,21 @@ const TOAST_SAMPLE = {
 }
 
 
+const CLIENT_INFO = {  // 업체정보
+   
+    code  : "314-13-24575",
+    company_name : "장안유통(대청254번)",
+    name : "김옥병",
+    address : "대전시 대덕구 오정동 705 대청254번",
+    type : "도,소매",
+    type2 : "음식재료",
+    fax : "042-369-6892",
+
+}
+
+
+
+
 const TABLE_FILTER : any = {
     product : [
     {value : "all",name : "전체"},
@@ -530,7 +545,8 @@ export {
     TABLE_HEADER_CONFIG,
     TABLE_COMPONENT,
     TABLE_FILTER,
-    EXCEL_CONFIG
+    EXCEL_CONFIG,
+    CLIENT_INFO,
 }
 
 
