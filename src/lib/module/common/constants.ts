@@ -420,6 +420,7 @@ const TABLE_HEADER_CONFIG : any = {
     user_order_sub_list : [
        
         {title:"상품명", field:"name",  
+        width:250,
    
         tooltip: true, // 특정 열에 대한 툴팁 설정
         formatter:function(cell : any){
@@ -431,7 +432,7 @@ const TABLE_HEADER_CONFIG : any = {
  
 
         },
-        {title:"수량", field:"qty", editor : "input",formatter: "money",  formatterParams: {
+        {title:"수량", field:"qty", width:150, editor : "input",formatter: "money",  formatterParams: {
           
             thousand:",",
             precision:false,
@@ -451,7 +452,7 @@ const TABLE_HEADER_CONFIG : any = {
          }
         },
        
-        {title:"수량", field:"qty", width:150, editor : "input",formatter: "money",  formatterParams: {
+        {title:"수량", field:"qty", width:100, editor : "input",formatter: "money",  formatterParams: {
           
             thousand:",",
             precision:false,

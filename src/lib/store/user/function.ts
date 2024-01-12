@@ -42,6 +42,7 @@ let init_form_data = {
     phone : '',
     password : '1111',
     car : '',
+    auth : '',
     used : 1,
 
 }
@@ -104,12 +105,14 @@ const userModalOpen = () => {
     })
 
     // console.log('update_form : ', update_form)
-    // return console.log('filtered_user_data : ', filtered_user_data);
-  
     
         Object.keys(update_form).map((item)=> {    
             if(item === 'car'){
               update_form[item] = filtered_user_data[0][item]['uid'];
+            }else if(item === 'auth'){
+              update_form[item] = filtered_user_data[0][item][0];
+            
+            
             }else{
               update_form[item] = filtered_user_data[0][item];
             }
@@ -166,6 +169,16 @@ const save = (param,title) => {
   update_modal['title'] = 'add';
   update_modal['add']['use'] = true;
  
+  let auth ;
+
+  if(param.auth === 'ROLE_ADMIN'){
+    auth= 'admin';
+
+  }else{
+    auth = 'user';
+  }
+
+
     
     if(title === 'update'){
       const url = `${api}/user/update`
@@ -186,7 +199,7 @@ const save = (param,title) => {
           phone : param.phone,
           car_uid : param.car,
           used : param.used,
-          auth : 'user',
+          auth : auth,
           token : login_data['token'],
          
 
@@ -405,6 +418,7 @@ const save = (param,title) => {
 
     
 }
+
 
 
 

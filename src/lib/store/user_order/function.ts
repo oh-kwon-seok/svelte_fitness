@@ -206,13 +206,14 @@ const save = (param,title) => {
  
     if(title === 'add'){
       console.log('param : ', param);
-      let data = table_data['user_order_sub_list'].getSelectedData();
-
+      let data = table_data['user_order_sub_list'].getData();
+      
+      
       let checked_data = data.filter(item => {
         return parseInt(item.qty) > 0 && item.qty !== undefined 
       })
 
-      
+     
     
       if( car_uid === '' || (checked_data.length === 0 &&  param['selectedImage']==='')){
         //return common_toast_state.update(() => TOAST_SAMPLE['fail']);
@@ -756,4 +757,32 @@ const userTable = (table_state,type,tableComponent) => {
 }
 
 
-export {userOrderModalOpen,save,userTable,userOrderSubTable,userOrderFileUpload,tempSave}
+const modalClose = (title) => {
+  
+  
+
+
+  update_modal['title'] = '';
+  update_modal[title]['use'] = !update_modal[title]['use'];
+
+  alert['type'] = 'save';
+  alert['value'] = false;
+  common_alert_state.update(() => alert);
+  if(table_data['user_order_sub']){
+    table_data['user_order_sub'].destory();
+    
+    table_state.update(()=> table_data);
+
+  }
+
+  user_order_modal_state.update(() => update_modal);
+
+
+
+
+
+}
+
+
+
+export {userOrderModalOpen,save,userTable,userOrderSubTable,userOrderFileUpload,tempSave,modalClose}

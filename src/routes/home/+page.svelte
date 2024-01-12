@@ -59,10 +59,10 @@
           <Card img={food_url}  class="mb-4 h-screen text-center">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">식자재 유통 서비스</h5>
             <p class="mb-3 font-normal text-gray-700 dark:text-gray-400 leading-tight">아래 버튼으로 확인할 수 있습니다.</p>
-              <Button on:click={() => {userOrderModalOpen('','add')}}>
+              <Button class="m-3"color="blue" on:click={() => {userOrderModalOpen('','add')}}>
                 주문하기
               </Button>
-              <Button on:click={() => window.location.href = '/sale/user_order_sub'}>
+              <Button color="primary" on:click={() => window.location.href = '/sale/user_order_sub'}>
                 주문현황
               </Button >
                <Footer />
