@@ -8,12 +8,13 @@ import {user_order_modal_state,user_order_form_state} from './state';
 
 import {v4 as uuid} from 'uuid';
 import axios from 'axios'
-import {common_alert_state, common_toast_state,common_search_state,login_state,table_state,common_selected_state,common_user_state} from '$lib/store/common/state';
+import {common_alert_state, common_toast_state,common_search_state,login_state,table_state,table_real_state,common_selected_state,common_user_state} from '$lib/store/common/state';
 import moment from 'moment';
 
 import {TOAST_SAMPLE} from '$lib/module/common/constants';
 import { businessNumber,phoneNumber} from '$lib/module/common/function';
 import {TabulatorFull as Tabulator} from 'tabulator-tables';
+
 import {TABLE_TOTAL_CONFIG,TABLE_HEADER_CONFIG,TABLE_FILTER} from '$lib/module/common/constants';
 import { setCookie, getCookie, removeCookie } from '$lib/cookies';
 
@@ -30,6 +31,8 @@ let toast : any;
 let search_state : any;
 let login_data : any;
 let table_data : any;
+let table_real_data : any;
+
 let user_data : any;
 
 let selected_data : any;
@@ -41,6 +44,9 @@ let init_form_data = {
 
   price_status : '미수금',
   order_status : '주문완료',
+  req_date : moment().add(1, 'day').format('YYYY-MM-DD'),
+  req_des : '',
+  description : '**농협 김옥병(453103-56-019411) 오늘도 건강하고 힘나는 하루 되세요**',
   car : '',
   used : 1,
   selectedImage : '',
@@ -74,6 +80,9 @@ login_state.subscribe((data) => {
 table_state.subscribe((data) => {
   table_data = data;
 })
+table_real_state.subscribe((data) => {
+  table_real_data = data;
+})
 
 common_selected_state.subscribe((data) => {
   selected_data = data;
@@ -100,9 +109,8 @@ const userOrderModalOpen = (data : any, title : any) => {
     update_modal[title]['use'] = true;
     user_order_modal_state.update(() => update_modal);
 
-    console.log('update_modal : ', update_modal);
-   
-
+ 
+  
     if(title === 'add'){
       user_order_form_state.update(() => init_form_data);
      
@@ -122,15 +130,13 @@ const userOrderModalOpen = (data : any, title : any) => {
 
             user_order_form_state.update(() => update_form);
             user_order_modal_state.update(() => update_modal);
-            console.log('update_modal : ', update_modal);
-
+    
     }
     if(title === 'check_delete'){
       let data =  table_data['user'].getSelectedData();
 
       common_selected_state.update(() => data);
-      
-      console.log('modalOpen : ', data);
+    
       let uid_array = [];
       if(data.length === 0){
         alert['value'] = true;
@@ -174,10 +180,9 @@ const select_query = (type) => {
     }
   }
     axios.get(url,config).then(res=>{
-      console.log('table_state : ', table_state['user_order']);
       table_data[type].setData(res.data);
       table_state.update(() => table_data);
-      console.log('table_data : ', table_data);
+    
    })
 
 }
@@ -199,29 +204,32 @@ const save = (param,title) => {
   }
 
 
-  console.log('param : ', param);
 
   update_modal['title'] = 'add';
   update_modal['add']['use'] = true;
  
     if(title === 'add'){
-      console.log('param : ', param);
-      let data = table_data['user_order_sub_list'].getData();
+    
+      let data = table_data['user_order_sub2_list'].getData();
       
-      
+   
       let checked_data = data.filter(item => {
         return parseInt(item.qty) > 0 && item.qty !== undefined 
       })
 
+      
      
+
     
       if( car_uid === '' || (checked_data.length === 0 &&  param['selectedImage']==='')){
         //return common_toast_state.update(() => TOAST_SAMPLE['fail']);
         alert['type'] = 'save';
         alert['value'] = true;
         user_order_modal_state.update(() => update_modal);
- 
-        return common_alert_state.update(() => alert);
+        
+     
+        return common_alert_state.update(() => alert);  
+        
   
       }else {
       
@@ -233,6 +241,9 @@ const save = (param,title) => {
             
             order_status : '주문완료',
             price_status : '미수금',
+            req_date : param.req_date,
+            req_des : param.req_des,
+            description : param.description,
             user_id : user_uid,
             car_uid : car_uid,
             used : param.used,
@@ -279,14 +290,8 @@ const save = (param,title) => {
       let checked_data = data.filter(item => {
         return parseInt(item.qty) > 0 && item.qty !== undefined 
       })
-
-     
-     
       try {
-
-        
         let params = {
-
           uid : param.uid,
           order_status : param.order_status,
           price_status : param.price_status,
@@ -296,18 +301,13 @@ const save = (param,title) => {
           auth : 'user',
           user_order_sub : checked_data,
           token : login_data['token'],
-
-         
-        
-
         };
       axios.post(url,
         params,
       ).then(res => {
         console.log('res',res);
         if(res.data !== undefined && res.data !== null && res.data !== '' ){
-          console.log('실행');
-          console.log('res:data', res.data);
+         
           
           toast['type'] = 'success';
           toast['value'] = true;
@@ -412,76 +412,85 @@ const save = (param,title) => {
     update_modal['title'] = 'add';
     update_modal['add']['use'] = true;
    
-      if(title === 'add'){
-        console.log('param : ', param);
-        let data = table_data['user_order_sub_list'].getSelectedData();
-  
-        let checked_data = data.filter(item => {
-          return parseInt(item.qty) > 0 && item.qty !== undefined 
-        })
-  
-        
+    if(title === 'add'){
+    
+      let data = table_data['user_order_sub2_list'].getData();
       
-        if( car_uid === '' || (checked_data.length === 0 )){
-          //return common_toast_state.update(() => TOAST_SAMPLE['fail']);
-          alert['type'] = 'save';
-          alert['value'] = true;
-          user_order_modal_state.update(() => update_modal);
    
-          return common_alert_state.update(() => alert);
+      let checked_data = data.filter(item => {
+        return parseInt(item.qty) > 0 && item.qty !== undefined 
+      })
+
+      
+     
+
     
-        }else {
+      if( car_uid === '' || (checked_data.length === 0 &&  param['selectedImage']==='')){
+        //return common_toast_state.update(() => TOAST_SAMPLE['fail']);
+        alert['type'] = 'save';
+        alert['value'] = true;
+        user_order_modal_state.update(() => update_modal);
         
-          const url = `${api}/user_temp_order/save`
-          try {
-    
-            
-            let params = {
-              
-              order_status : '장바구니',
-              user_id : user_uid,
-              car_uid : car_uid,
-              used : param.used,
-              auth : 'user',
-              user_temp_order_sub : checked_data,
-              token : login_data['token'],
-            };
-          axios.post(url,
-            params,
-          ).then(res => {
-            console.log('res',res);
-            if(res.data !== undefined && res.data !== null && res.data !== '' ){
-            
-              toast['type'] = 'success';
-              toast['value'] = true;
-              update_modal['title'] = '';
-              update_modal['add']['use'] = !update_modal['add']['use'];
-              user_order_modal_state.update(() => update_modal);
-      
-      
-              return common_toast_state.update(() => toast);
+     
+        return common_alert_state.update(() => alert);  
+        
   
-            }else{
+      }else {
+      
+        const url = `${api}/user_order/save`
+        try {
+  
+          
+          let params = {
             
-              return common_toast_state.update(() => TOAST_SAMPLE['fail']);
-            }
-          })
-          }catch (e:any){
-            return console.log('에러 : ',e);
+            order_status : '장바구니',
+            price_status : '미수금',
+            req_date : param.req_date,
+            req_des : param.req_des,
+            description : param.description,
+            user_id : user_uid,
+            car_uid : car_uid,
+            used : param.used,
+            image_url : param['selectedImage'],  
+            auth : 'user',
+            user_order_sub : checked_data,
+            token : login_data['token'],
           };
-        }
-  
-  
-      
+        axios.post(url,
+          params,
+        ).then(res => {
+          console.log('res',res);
+          if(res.data !== undefined && res.data !== null && res.data !== '' ){
+          
+            toast['type'] = 'success';
+            toast['value'] = true;
+            update_modal['title'] = '';
+            update_modal['add']['use'] = !update_modal['add']['use'];
+            user_order_modal_state.update(() => update_modal);
+    
+    
+            return common_toast_state.update(() => toast);
+
+          }else{
+          
+            return common_toast_state.update(() => TOAST_SAMPLE['fail']);
+          }
+        })
+        }catch (e:any){
+          return console.log('에러 : ',e);
+        };
       }
+
+
+    
+    }
       
     }
 
 
   const userOrderSubTable = (table_state,type,tableComponent) => {
 
-    console.log('update : ', update_modal['title']);
-    console.log('update : ', update_modal['title']);
+   
     
     let user_id = getCookie('my-cookie');
 
@@ -557,14 +566,17 @@ const save = (param,title) => {
                 
                 
               }
+
+
+              table_real_data['user_order_sub_list'] = user_order_checked_data; // 원본데이터 보관용
+
+              table_real_state.update(()=> table_real_data);
+
              
               table_data['user_order_sub_list'] =   new Tabulator(tableComponent, {
                 tooltips: true, // 전역 설정: 모든 열에 툴팁 적용
-                
-              
-            
-                height:"50vh",
-                layout:"fitColumns",
+                height:"20vh",
+                layout:"fitDataTable",
                 movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
                 locale: TABLE_TOTAL_CONFIG['locale'],
                 langs: TABLE_TOTAL_CONFIG['langs'],
@@ -595,6 +607,7 @@ const save = (param,title) => {
                 columns: TABLE_HEADER_CONFIG['user_order_sub_list'],
                 
                 });
+
                 table_state.update(()=> table_data);
              
            })
@@ -643,6 +656,52 @@ const save = (param,title) => {
      })
 
     
+}
+
+
+
+const userOrderSub2Table = (table_state,tableComponent) => {
+      console.log('데이터없음 ㅎㅎ');
+        
+      
+            table_data['user_order_sub2_list'] =   new Tabulator(tableComponent, {
+              tooltips: true, // 전역 설정: 모든 열에 툴팁 적용
+              height:"20vh",
+              layout:"fitDataTable",
+              movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
+              locale: TABLE_TOTAL_CONFIG['locale'],
+              langs: TABLE_TOTAL_CONFIG['langs'],
+              selectable: true,
+              placeholder:"데이터 없음",
+              rowClick:function(e, row){
+                //e - the click event object
+                //row - row component
+             
+                row.toggleSelect(); //toggle row selected state on row click
+            },
+    
+              rowFormatter:function(row){
+                    row.getElement().classList.add("table-primary"); //mark rows with age greater than or equal to 18 as successful;
+                    let selected = row.getData().selected;
+
+                    if(selected){
+                      row.getElement().classList.add("tabulator-selected");
+                      row.toggleSelect();
+                    }
+              },
+              cellEdited:function(cell){
+                // 행이 업데이트될 때 실행되는 코드
+                var updatedData = cell.getData();
+                console.log("Updated Data:", updatedData);
+                // 여기에서 데이터를 처리하면 됩니다.
+            },
+              data : table_real_data['user_order_sub2_list'],
+              columns: TABLE_HEADER_CONFIG['user_order_sub2_list'],
+              
+              });
+
+              table_state.update(()=> table_data);
+           
 }
 
 const userOrderFileUpload = (e) => {
@@ -783,6 +842,110 @@ const modalClose = (title) => {
 
 }
 
+const userOrderTabClick = (title) => {
+  
+  console.log(title);
+  if(table_real_data['user_order_sub_list'].length > 0){
+   
+    console.log('user_order_sub_list : ',table_real_data['user_order_sub_list']);
+
+    let check_data = [];
+    if(title === "전체"){
+      check_data = table_real_data['user_order_sub_list'];
+    }else {
+      check_data = table_real_data['user_order_sub_list'].filter(item=> {
+        return item['product']['type'] === title;
+      })
+    }
+    
+    table_data['user_order_sub_list'].setData(check_data);
+    table_state.update(()=> table_data);
+    
+
+  }
+}
+
+// tabulator에서만 사용가능한 함수임
+function updateUserOrder(cell:any) {
+  // "qty" 셀과 "price" 셀의 값을 가져옴
+  var qty = cell.getData().qty || 0;
+  var price = cell.getData().price || 0;
+
+  // "supply_price" 셀을 계산하여 업데이트
+  var supplyPrice = qty * price;
 
 
-export {userOrderModalOpen,save,userTable,userOrderSubTable,userOrderFileUpload,tempSave,modalClose}
+
+  cell.getRow().update({ supply_price: supplyPrice });
+
+  
+  if(qty > 0){
+    let new_data = cell.getData();
+  
+  
+    let checkData = table_real_data['user_order_sub2_list'].find(item => item['product']['uid'] === new_data['product']['uid']);
+  
+    
+    if(checkData){
+      console.log('checkData : ', checkData);
+  
+    }else{
+      table_real_data['user_order_sub2_list'].push(new_data);
+      table_real_state.update(()=> table_real_data);
+  
+    }
+  
+   
+    console.log('real_Data ; ', table_real_data['user_order_sub2_list']);
+
+    table_data['user_order_sub2_list'].setData(table_real_data['user_order_sub2_list']);
+  
+    table_state.update(()=> table_data);
+
+  }
+}
+
+function deleteUserOrder(cell:any) {
+
+  let new_data = cell.getData();
+  
+  
+  let checkData = table_real_data['user_order_sub_list'].find(item => item['product']['uid'] === new_data['product']['uid']);
+
+
+  if(checkData){
+    checkData['qty'] = 0;
+    
+
+  
+  let newData = table_data['user_order_sub2_list'].getData().filter(item => item['product']['uid'] !== checkData['product']['uid']);
+
+  table_data['user_order_sub2_list'].setData(newData);
+
+
+
+  table_real_data['user_order_sub2_list'] = newData; 
+
+  table_state.update(()=> table_data);
+
+  table_real_state.update(()=> table_real_data);
+
+  
+
+    
+  }else{
+    
+
+  }
+
+ 
+
+ 
+ 
+   
+}
+
+
+
+
+export {userOrderModalOpen,save,userTable,userOrderSubTable,userOrderFileUpload,tempSave,modalClose,userOrderTabClick,updateUserOrder,userOrderSub2Table,deleteUserOrder}

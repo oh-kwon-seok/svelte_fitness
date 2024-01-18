@@ -17,7 +17,7 @@ import { phoneNumber,businessNumber,updateSupplyPrice } from './function';
 
 import { userModalOpen} from '$lib/store/user/function';
 
-import { userOrderModalOpen} from '$lib/store/user_order/function';
+import { userOrderModalOpen,updateUserOrder,deleteUserOrder} from '$lib/store/user_order/function';
 
 
 
@@ -78,6 +78,10 @@ const DATA_FAIL_ALERT = {
     check_delete : {title : '선택 삭제', content : '데이터 선택 삭제에 실패했습니다.'},
     
 }
+
+const PROD_TYPE_ARRAY : any =  ["전체","채소류","김치","육류","수산물","젓갈","건어물","냉동","일회용품","공산품","기타"];
+
+
 
 const DATA_SELECT_ALERT = {
     color : 'red',
@@ -437,11 +441,49 @@ const TABLE_HEADER_CONFIG : any = {
             thousand:",",
             precision:false,
 
-        },cellEdited: updateSupplyPrice},
+        },cellEdited: updateUserOrder},
        
         
 
     
+       ],
+       user_order_sub2_list : [
+       
+        {title:"상품명", field:"name",  
+        width:100,
+   
+        tooltip: true, // 특정 열에 대한 툴팁 설정
+        formatter:function(cell : any){
+            var value = cell.getValue();
+        return "<div style='overflow: visible; white-space:normal;'><span style='color:black; font-weight:bold; '>" + value + "</span></div>";
+         },
+    
+         
+ 
+
+        },
+        {title:"수량", field:"qty", width:100, editor : "input",formatter: "money",  formatterParams: {
+          
+            thousand:",",
+            precision:false,
+
+        }},
+
+     
+        {title:"삭제", field:"delete", width:100,  
+        formatter:function(cell : any){
+           
+        return "<span style='color:red; font-weight:bold;'>삭제</span>";
+        },
+        cellClick:function(e : any, cell:any){
+            let row = cell.getRow();
+        if(row){
+            deleteUserOrder(row);
+        }else{
+        
+        }
+        }
+        },
        ],
 
        user_order_sub: [
@@ -548,6 +590,7 @@ export {
     TABLE_FILTER,
     EXCEL_CONFIG,
     CLIENT_INFO,
+    PROD_TYPE_ARRAY
 }
 
 

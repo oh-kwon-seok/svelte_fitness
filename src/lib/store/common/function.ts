@@ -2,7 +2,7 @@
 
 
 import { writable } from 'svelte/store';
-import {common_alert_state,common_toast_state, menu_state,url_state,load_state,common_search_state,login_state,common_product_state,  common_car_state,common_company_state,common_user_state,common_user_order_state,common_user_order_sub_state,table_state } from './state';
+import {common_alert_state,common_toast_state, menu_state,url_state,load_state,common_search_state,login_state,common_product_state,  common_car_state,common_company_state,common_user_state,common_user_order_state,common_user_order_sub_state,table_state,table_real_state } from './state';
 
 // import {item_data,item_form_state} from '$lib/store/info/item/state';
 
@@ -37,6 +37,7 @@ let login_data : any;
 let url_data : any;
 
 let table_data : any;
+let table_real_data : any;
 
 let product_data : any;
 
@@ -99,7 +100,9 @@ login_state.subscribe((data) => {
 table_state.subscribe((data : any) => {
   table_data = data;
 })
-
+table_real_state.subscribe((data : any) => {
+  table_real_data = data;
+})
 
 common_product_state.subscribe((data : any) => {
   product_data = data;
@@ -753,6 +756,7 @@ const excelDownload = (type,config) => {
               console.log('table_data  :', table_data);
 
               table_state.update(()=> table_data);
+       
 
           
             
@@ -797,7 +801,7 @@ const excelDownload = (type,config) => {
             console.log('table_data  :', table_data);
 
             table_state.update(()=> table_data);
-
+        
 
        
         }
