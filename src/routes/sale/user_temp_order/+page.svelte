@@ -25,7 +25,7 @@
     
     
 
-    import {url_state,cookie_state,common_user_order_sub_state,table_state,common_toast_state,common_search_state} from '$lib/store/common/state';
+    import {url_state,cookie_state,common_user_order_state,table_state,common_toast_state,common_search_state} from '$lib/store/common/state';
     import {TABLE_COMPONENT,EXCEL_CONFIG} from '$lib/module/common/constants';
 
     import SearchBar from '$lib/components/layout/SearchBar.svelte'
@@ -34,6 +34,8 @@
     import {selectCardQuery} from '$lib/store/common/function';
 
     import {userOrderSubexcelDownload} from '$lib/store/user_order_sub/function';
+    import {user_order_modal_state} from '$lib/store/user_order/state';
+    
     import food_url from '$lib/images/food.jpg';
 
 
@@ -53,7 +55,7 @@
 
     onMount(()=>{
      
-      selectCardQuery('user_temp_order_sub','mobile_select');
+      selectCardQuery('user_order','mobile_temp_select');
        
       
     });
@@ -65,8 +67,8 @@
             alert('잘못된 주소거나 요청시간이 만료되었습니다.');
         }else if($url_state['path'] === '/user_temp_order'){
          
-          selectCardQuery('user_temp_order_sub','mobile_select');
-     }
+          selectCardQuery('user_order','mobile_temp_select');
+        }
       
     })
      
@@ -90,26 +92,28 @@
 
         <Card img={food_url}  class="mb-4 h-screen text-center">
           <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">장바구니 현황</h5>
-          <SearchBar title="user_temp_order_sub" label="등록일자"/>    
+          <SearchBar title="user_order" label="등록일자"/>    
 
 
-            {#if $common_user_order_sub_state && $common_user_order_sub_state.length > 0}
-          <Listgroup items={$common_user_order_sub_state} let:item class="border-0 dark:!bg-transparent">
+            {#if $common_user_order_state && $common_user_order_state.length > 0}
+          <Listgroup items={$common_user_order_state} let:item class="border-0 dark:!bg-transparent">
             <div class="flex items-center space-x-4 rtl:space-x-reverse">
               <!-- <Avatar src={item.img.src} alt={item.img.alt} class="flex-shrink-0" /> -->
               <Icon.BasketShoppingSolid class='mr-2' size="20" />
               <div class="flex-1 min-w-0">
                 <p class="whitespace-normal text-sm font-medium text-gray-900 truncate dark:text-white">
-                  {item['product']['name']}
+                  <!-- {item['product']['name']} -->
                 </p>
-                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                  {moment(item['created']).format('YY-MM-DD')} 
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400" on:click={() => {userOrderModalOpen(item,"update")}}>
+                     
+                 장바구니
                 </p>
               </div>
               <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                {item['qty']}
+                  {moment(item['created']).format('YY-MM-DD')} 
               </div>
-              <div ><Icon.TrashSolid class='mr-2' size="20" /></div>
+              <div on:click={() => {userOrderModalOpen(item,"check_delete")}}><Icon.TrashSolid class='mr-2' size="20"/></div>
       
 
               
@@ -123,6 +127,12 @@
           {/if}
 
 
+        
+          {#if $user_order_modal_state['title'] === 'update'}
+            <Util  title="update"/>
+            {:else if $user_order_modal_state['title'] === 'check_delete'}
+            <Util  title="check_delete"/>
+          {/if}
 
              <Footer />
         </Card>

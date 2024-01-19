@@ -856,9 +856,17 @@ const excelDownload = (type,config) => {
         axios.get(url,config).then(res=>{
          
           console.log('res : ',res);
-          user_order_sub_data = res.data;
+          if(type === 'user_order'){
+            user_order_data= res.data;
+            common_user_order_state.update(() => user_order_data);
+          }else {
+            user_order_sub_data= res.data;
+            common_user_order_sub_state.update(() => user_order_sub_data);
+          }
+        
 
-          common_user_order_sub_state.update(() => user_order_sub_data);
+
+          
          
        })
     

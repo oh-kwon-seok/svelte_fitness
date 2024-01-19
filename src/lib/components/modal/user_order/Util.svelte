@@ -37,13 +37,13 @@
    
    
     if(title === 'add'){
-      label_title = '저장';
+      label_title = '주문 저장';
     }else if(title === 'update'){
-      label_title = '수정';
+      label_title = '장바구니 수정';
     }else if(title === 'delete'){
-      label_title = '삭제';
+      label_title = '장바구니 삭제';
     }else if(title === 'check_delete'){
-      label_title = '선택 삭제';
+      label_title = '장바구니 삭제';
     }
 
     let color = title === 'add' || title === 'update' ? 'blue' : 'red'; 
@@ -90,7 +90,7 @@
 
     
 
-    <Modal title={`주문 ${label_title}`} permanent={true} color={color} bind:open={$user_order_modal_state[title]['use']} size="xl" placement={title === 'add' || title === 'check_delete'  ? 'center' : 'center-right'}   class="w-full">
+    <Modal title={`${label_title}`} permanent={true} color={color} bind:open={$user_order_modal_state[title]['use']} size="xl" placement={title === 'add' || title === 'check_delete'  ? 'center' : 'center-right'}   class="w-full">
        
           <!-- grid grid-cols-2 gap-4 -->
         <form action="#">
@@ -141,6 +141,9 @@
           <Textarea id="textarea-id" placeholder="요청사항이 있다면 입력해주세요" rows="4" name="message" bind:value={$user_order_form_state['req_des']}/>
 
           <div class='mt-5 text-center flex flex-row '>
+          
+          
+          
           <Button  class="w-1/2 mr-3" color='blue' on:click={(e)=> fileButtonClick('upload')}>
             <Icon.FileImageSolid class='mr-2' size="20" />
               사진 주문
@@ -152,13 +155,18 @@
             on:change={(e)=> userOrderFileUpload(e)}
             />
         </Button>
+        
+       
+       
+       
+      
+        
         <Button  class="w-1/2" color='green' on:click={tempSave($user_order_form_state,title)}>
           <Icon.BasketShoppingSolid class='mr-2' size="20" />
           장바구니
         </Button>
-
       
-
+        
 
         
         {#if $user_order_form_state['selectedImage']}
@@ -181,8 +189,9 @@
       {/if}
     
     
-      
-      
+      {#if title === 'check_delete'}
+              <div>선택한 항목을 삭제하시겠습니까?</div>
+      {/if}
         </form>
         
         
@@ -211,7 +220,7 @@
          
          
    
-        <Button  color={'blue'}   class="w-full" on:click={save($user_order_form_state,title)}>{label_title}</Button>
+        <Button  color={'blue'}   class="w-full" on:click={save($user_order_form_state,title)}>{title === 'update' ? '주문' : label_title}</Button>
 
          
           <Button  class="w-full" color='red' on:click={modalClose(title)}>

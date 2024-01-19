@@ -9,6 +9,8 @@ import {user_order_modal_state,user_order_form_state} from './state';
 import {v4 as uuid} from 'uuid';
 import axios from 'axios'
 import {common_alert_state, common_toast_state,common_search_state,login_state,table_state,table_real_state,common_selected_state,common_user_state} from '$lib/store/common/state';
+import {selectCardQuery} from '$lib/store/common/function';
+
 import moment from 'moment';
 
 import {TOAST_SAMPLE} from '$lib/module/common/constants';
@@ -109,7 +111,8 @@ const userOrderModalOpen = (data : any, title : any) => {
     update_modal[title]['use'] = true;
     user_order_modal_state.update(() => update_modal);
 
- 
+
+
   
     if(title === 'add'){
       user_order_form_state.update(() => init_form_data);
@@ -128,25 +131,23 @@ const userOrderModalOpen = (data : any, title : any) => {
            
         }); 
 
+        
+
             user_order_form_state.update(() => update_form);
             user_order_modal_state.update(() => update_modal);
     
     }
     if(title === 'check_delete'){
-      let data =  table_data['user'].getSelectedData();
-
-      common_selected_state.update(() => data);
-    
-      let uid_array = [];
-      if(data.length === 0){
-        alert['value'] = true;
-        common_alert_state.update(() => alert);
-
-      }else{
-        for(let i=0; i<data.length; i++){
-          uid_array.push(data[i]['uid']);
+      Object.keys(update_form).map((item)=> {    
+        if(item === 'car'){
+          update_form[item] = data[item]['uid'];
+        }else if(item === 'user'){
+          update_form[item] = data[item]['id'];
+        }else{
+          update_form[item] = data[item];
         }
-      }
+       
+    }); 
   }
 }
 
@@ -285,15 +286,22 @@ const save = (param,title) => {
       const url = `${api}/user_order/update`
       
       
-      let data =  table_data['user_order_sub'].getSelectedData();
-
+      let data = table_data['user_order_sub2_list'].getData();
+      
+   
       let checked_data = data.filter(item => {
         return parseInt(item.qty) > 0 && item.qty !== undefined 
-      })
+      });
+
+
+
       try {
         let params = {
           uid : param.uid,
-          order_status : param.order_status,
+          req_date : param.req_date,
+          req_des : param.req_des,
+
+          order_status : '주문완료',
           price_status : param.price_status,
           user_id : param.user,
           car_uid : param.car,
@@ -315,7 +323,7 @@ const save = (param,title) => {
           update_modal['update']['use'] = false;
           user_order_modal_state.update(() => update_modal);
           user_order_form_state.update(()=> init_form_data);
-          select_query('user_order');
+          selectCardQuery('user_order','mobile_temp_select');
           return common_toast_state.update(() => toast);
 
         }else{
@@ -330,27 +338,17 @@ const save = (param,title) => {
 
      
     }if(title === 'check_delete'){
-      let data =  selected_data;
       let uid_array = [];
-
-      console.log('deleted_data : ', data);
-      if(data.length === 0){
-        alert['value'] = true;
-        common_alert_state.update(() => alert);
-
-      }else{
-        for(let i=0; i<data.length; i++){
-          uid_array.push(data[i]['id']);
-        }
-      }
-
+          uid_array.push(param.uid);
+        
+      
         if(uid_array.length > 0){
 
-          const url = `${api}/user/delete`
+          const url = `${api}/user_order/delete`
           try {
     
             let params = {
-              id : uid_array,
+              uid : uid_array,
             };
           axios.post(url,
             params,
@@ -363,11 +361,11 @@ const save = (param,title) => {
               toast['type'] = 'success';
               toast['value'] = true;
               update_modal['title'] = '';
-              update_modal['update']['use'] = false;
+              update_modal[title]['use'] = false;
               user_order_modal_state.update(() => update_modal);
               user_order_form_state.update(()=> init_form_data);
 
-              select_query('user_order');
+              selectCardQuery('user_order','mobile_temp_select');
     
               return common_toast_state.update(() => toast);
     
@@ -479,10 +477,62 @@ const save = (param,title) => {
         }catch (e:any){
           return console.log('에러 : ',e);
         };
-      }
+      }    
+    }
 
-
+    if(title === 'update'){
     
+      const url = `${api}/user_order/update`
+      
+      
+      let data =  table_data['user_order_sub'].getSelectedData();
+
+      let checked_data = data.filter(item => {
+        return parseInt(item.qty) > 0 && item.qty !== undefined 
+      })
+
+      try {
+        let params = {
+          uid : param.uid,
+          req_date : param.req_date,
+          req_des : param.req_des,
+
+          order_status : '장바구니',
+          price_status : param.price_status,
+          user_id : param.user,
+          car_uid : param.car,
+          used : param.used,
+          auth : 'user',
+          user_order_sub : checked_data,
+          token : login_data['token'],
+        };
+      axios.post(url,
+        params,
+      ).then(res => {
+        console.log('res',res);
+        if(res.data !== undefined && res.data !== null && res.data !== '' ){
+         
+          
+          toast['type'] = 'success';
+          toast['value'] = true;
+          update_modal['title'] = '';
+          update_modal['update']['use'] = false;
+          user_order_modal_state.update(() => update_modal);
+          user_order_form_state.update(()=> init_form_data);
+          selectCardQuery('user_order','mobile_temp_select');
+          return common_toast_state.update(() => toast);
+
+        }else{
+        
+          return common_toast_state.update(() => TOAST_SAMPLE['fail']);
+        }
+      })
+      }catch (e:any){
+        return console.log('에러 : ',e);
+      };
+
+
+      
     }
       
     }
@@ -494,54 +544,15 @@ const save = (param,title) => {
     
     let user_id = getCookie('my-cookie');
 
-    const url = `${api}/product/select`; 
+    
 
-  
-    let start_date = moment().subtract(10, "year").format('YYYY-MM-DDTHH:mm:ss');
-
-    let end_date = moment().add(1, "day").format('YYYY-MM-DDTHH:mm:ss');
-
-    let search_text = '';
-    let filter_title = 'all';
-    let checked_data = [];
-  
-
-    let params = 
-    {
-      start_date : start_date,
-      end_date  : end_date,
-      search_text : search_text,
-      filter_title : filter_title,   
-    };
-
-   
-    const config = {
-      params : params,
-      headers:{
-        "Content-Type": "application/json",
-        
-      }
-    }
-      axios.get(url,config).then(res=>{
-        if(table_state['user_order_sub']){
-          table_state['user_order_sub'].destory();
-        }
-
-        if(res.data.length > 0){
-        
+      
           let url;
           let params;
           update_modal['title']
-          if(update_modal['title'] === 'add'){
-            url = `${api}/user_product/info_select`;
-            params = { user_id : user_id};
-
-          }
-          if(update_modal['title'] === 'update'){
-             url = `${api}/user_order_sub/info_select`;
-             params = { user_order_uid : update_form.uid};
-          }
-       
+          
+          url = `${api}/user_product/info_select`;
+          params = { user_id : user_id};
 
           const config = {
             params : params,
@@ -553,6 +564,11 @@ const save = (param,title) => {
             axios.get(url,config).then(res=>{
               
               let user_order_checked_data =  res.data;
+
+
+              if(table_state['user_order_sub']){
+                table_state['user_order_sub'].destory();
+              }
               
             
               for(let i=0; i < user_order_checked_data.length; i++){
@@ -563,13 +579,8 @@ const save = (param,title) => {
                 user_order_checked_data[i]['buy_price'] = 0;
                 user_order_checked_data[i]['supply_price'] = 0;
                 
-                
-                
               }
-
-
               table_real_data['user_order_sub_list'] = user_order_checked_data; // 원본데이터 보관용
-
               table_real_state.update(()=> table_real_data);
 
              
@@ -610,20 +621,123 @@ const save = (param,title) => {
 
                 table_state.update(()=> table_data);
              
-           })
-        
-         
-       
-        
-    }else{
-      
-      if(table_state['user_order_sub']){
-        table_state['user_order_sub'].destory();
-      }
+           });
 
-      table_data['user_order_sub'] =   new Tabulator(tableComponent, {
-        height:"25vh",
-        layout:TABLE_TOTAL_CONFIG['layout'],
+
+               if(update_modal['title'] === 'update'){
+                  let url = `${api}/user_order_sub/info_select`;
+                  let params = { user_order_uid : update_form.uid};
+                  const config = {
+                    params : params,
+                    headers:{
+                      "Content-Type": "application/json",
+                      
+                    }
+                  }
+
+                  axios.get(url,config).then(res=>{
+                    
+                    if(res.data.length > 0){
+
+
+                      let user_order_temp_data =  res.data;
+
+
+                      if(table_state['user_order_sub2_list']){
+                        table_state['user_order_sub2_list'].destory();
+                      }
+                      
+                    
+                      for(let i=0; i < user_order_temp_data.length; i++){
+                        user_order_temp_data[i]['uid'] = user_order_temp_data[i]['product']['uid'];
+                        user_order_temp_data[i]['name'] = user_order_temp_data[i]['product']['name'];
+                        user_order_temp_data[i]['qty'] =  parseInt(user_order_temp_data[i]['qty']);
+                        user_order_temp_data[i]['price'] = 0;
+                        user_order_temp_data[i]['buy_price'] = 0;
+                        user_order_temp_data[i]['supply_price'] = 0;
+                        
+                      }
+
+
+
+                     console.log(table_real_data['user_order_sub2_list']);
+                     if(table_real_data['user_order_sub2_list'].length === 0){
+                      table_real_data['user_order_sub2_list'] = user_order_temp_data;
+
+                      table_data['user_order_sub2_list'].setData(user_order_temp_data);
+                      table_real_state.update(()=> table_real_data); 
+                      table_state.update(()=> table_data);
+                     }else{
+
+                     }
+                    
+                    }
+
+
+                    });
+                }
+       
+    }
+      
+    
+ 
+
+
+
+const userOrderSub2Table = (table_state,tableComponent) => {
+      
+  console.log('table_real_data:',table_real_data['user_order_sub2_list']);
+  console.log('table_real_data:',update_modal['title']);
+  
+  // console.log('table_get_data:',table_data['user_order_sub2_list'].getData());
+  
+  if(update_modal['title'] === 'add'){
+    table_data['user_order_sub2_list'] =   new Tabulator(tableComponent, {
+      tooltips: true, // 전역 설정: 모든 열에 툴팁 적용
+      height:"20vh",
+      layout:"fitDataTable",
+      movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
+      locale: TABLE_TOTAL_CONFIG['locale'],
+      langs: TABLE_TOTAL_CONFIG['langs'],
+      selectable: true,
+      placeholder:"데이터 없음",
+      rowClick:function(e, row){
+        //e - the click event object
+        //row - row component
+     
+        row.toggleSelect(); //toggle row selected state on row click
+    },
+
+      rowFormatter:function(row){
+            row.getElement().classList.add("table-primary"); //mark rows with age greater than or equal to 18 as successful;
+            let selected = row.getData().selected;
+
+            if(selected){
+              row.getElement().classList.add("tabulator-selected");
+              row.toggleSelect();
+            }
+      },
+      cellEdited:function(cell){
+        // 행이 업데이트될 때 실행되는 코드
+        var updatedData = cell.getData();
+        console.log("Updated Data:", updatedData);
+        // 여기에서 데이터를 처리하면 됩니다.
+    },
+      data : table_real_data['user_order_sub2_list'],
+      columns: TABLE_HEADER_CONFIG['user_order_sub2_list'],
+      
+      });
+
+      table_state.update(()=> table_data);
+      table_real_state.update(()=> table_real_data);
+
+  }else if(update_modal['title'] === 'update'){
+
+    console.log('real2 : ', table_real_data['user_order_sub2_list']);
+      table_data['user_order_sub2_list'] =   new Tabulator(tableComponent, {
+        tooltips: true, // 전역 설정: 모든 열에 툴팁 적용
+        height:"20vh",
+        layout:"fitDataTable",
         movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
         locale: TABLE_TOTAL_CONFIG['locale'],
         langs: TABLE_TOTAL_CONFIG['langs'],
@@ -635,73 +749,41 @@ const save = (param,title) => {
        
           row.toggleSelect(); //toggle row selected state on row click
       },
-
+  
         rowFormatter:function(row){
               row.getElement().classList.add("table-primary"); //mark rows with age greater than or equal to 18 as successful;
-        },
-     
-
-        data : [],
-      
-        columns: TABLE_HEADER_CONFIG['user_product'],
-      
+              let selected = row.getData().selected;
   
-        });
-        console.log('table_data  :', table_data);
-
-        table_state.update(()=> table_data);
-
-
-    }
-     })
-
-    
-}
-
-
-
-const userOrderSub2Table = (table_state,tableComponent) => {
-      console.log('데이터없음 ㅎㅎ');
+              if(selected){
+                row.getElement().classList.add("tabulator-selected");
+                row.toggleSelect();
+              }
+        },
+        cellEdited:function(cell){
+          // 행이 업데이트될 때 실행되는 코드
+          var updatedData = cell.getData();
+          console.log("Updated Data:", updatedData);
+          // 여기에서 데이터를 처리하면 됩니다.
+      },
+        data : table_real_data['user_order_sub2_list'],
+        columns: TABLE_HEADER_CONFIG['user_order_sub2_list'],
         
-      
-            table_data['user_order_sub2_list'] =   new Tabulator(tableComponent, {
-              tooltips: true, // 전역 설정: 모든 열에 툴팁 적용
-              height:"20vh",
-              layout:"fitDataTable",
-              movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
-              locale: TABLE_TOTAL_CONFIG['locale'],
-              langs: TABLE_TOTAL_CONFIG['langs'],
-              selectable: true,
-              placeholder:"데이터 없음",
-              rowClick:function(e, row){
-                //e - the click event object
-                //row - row component
-             
-                row.toggleSelect(); //toggle row selected state on row click
-            },
+        });
+  
+        table_state.update(()=> table_data);
+        table_real_state.update(()=> table_real_data);
     
-              rowFormatter:function(row){
-                    row.getElement().classList.add("table-primary"); //mark rows with age greater than or equal to 18 as successful;
-                    let selected = row.getData().selected;
 
-                    if(selected){
-                      row.getElement().classList.add("tabulator-selected");
-                      row.toggleSelect();
-                    }
-              },
-              cellEdited:function(cell){
-                // 행이 업데이트될 때 실행되는 코드
-                var updatedData = cell.getData();
-                console.log("Updated Data:", updatedData);
-                // 여기에서 데이터를 처리하면 됩니다.
-            },
-              data : table_real_data['user_order_sub2_list'],
-              columns: TABLE_HEADER_CONFIG['user_order_sub2_list'],
+  }
+
+ 
+
+
+        
+
+          
               
-              });
-
-              table_state.update(()=> table_data);
-           
+        
 }
 
 const userOrderFileUpload = (e) => {
@@ -818,7 +900,7 @@ const userTable = (table_state,type,tableComponent) => {
 
 const modalClose = (title) => {
   
-  
+  console.log('title : ', title);
 
 
   update_modal['title'] = '';
@@ -827,10 +909,14 @@ const modalClose = (title) => {
   alert['type'] = 'save';
   alert['value'] = false;
   common_alert_state.update(() => alert);
-  if(table_data['user_order_sub']){
-    table_data['user_order_sub'].destory();
-    
+  if(table_state['user_order_sub_list']){
+  
+    table_state['user_order_sub_list'].destory();
+    table_state['user_order_sub2_list'].destory();
+
+    table_real_data['user_order_sub2_list'] = [];
     table_state.update(()=> table_data);
+    table_real_state.update(()=>  table_real_data);
 
   }
 
@@ -887,7 +973,18 @@ function updateUserOrder(cell:any) {
   
     
     if(checkData){
+
       console.log('checkData : ', checkData);
+      
+      for(let i=0; i<table_real_data['user_order_sub2_list'].length; i++){
+        
+        if(table_real_data['user_order_sub2_list'][i]['product']['uid'] === checkData['product']['uid']){
+          table_real_data['user_order_sub2_list'][i]['qty'] = qty;
+
+        }
+      }
+    
+      
   
     }else{
       table_real_data['user_order_sub2_list'].push(new_data);
