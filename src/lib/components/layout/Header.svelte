@@ -5,14 +5,18 @@
 	import { Navbar, NavBrand, NavHamburger, NavUl, NavLi, Chevron, MegaMenu   } from 'flowbite-svelte'
   import {MENU} from '$lib/module/common/constants'
 	import { userModalOpen } from '$lib/store/user/function';
+  import { userProductModalOpen } from '$lib/store/user_product/function';
   import { logout } from '$lib/store/common/function';
   
   
   import {login_state} from '$lib/store/common/state';
   
   import {user_form_state,user_modal_state} from '$lib/store/user/state';
+  import {user_product_form_state,user_product_modal_state} from '$lib/store/user_product/state';
   import Util from '$lib/components/modal/user/Util.svelte';
 
+  import ProductUtil from '$lib/components/modal/user_product/Util.svelte';
+  
   import logo from '$lib/images/jangan_logo.png';
 
  
@@ -44,7 +48,7 @@
             
             <NavLi href="/home">주문하기</NavLi>
             <NavLi href="/sale/user_order_sub">주문현황</NavLi>
-
+            <NavLi on:click={() => userProductModalOpen()}>즐겨찾기</NavLi>
 
             <NavLi href="/sale/user_temp_order">장바구니 조회</NavLi>
 
@@ -63,6 +67,9 @@
         {#if $user_modal_state['title'] === 'update'}
           <Util title="update" />
      
+        {/if}
+        {#if $user_product_modal_state['title'] === 'update'}
+          <ProductUtil title="update" />
         {/if}
         
 

@@ -58,6 +58,8 @@ function updateSupplyPrice(cell:any) {
     cell.getRow().update({ supply_price: supplyPrice });
 }
 
+
+
 function generateRandomString(length:number) {
 	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 	let result = '';

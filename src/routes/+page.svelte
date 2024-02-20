@@ -112,7 +112,7 @@ const naver_state = btoa(binaryString);
 
 
 
-	const login = async(e : any) => {
+	const login = (e : any) => {
 	
 
 		loadChange(true);
@@ -121,7 +121,7 @@ const naver_state = btoa(binaryString);
 		
 		const url = `${api}/user/sign-in`
 		try {
-			await performAsyncTask();
+			// await performAsyncTask();
 
 			let params = $login_state;
 				const config = {
