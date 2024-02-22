@@ -425,8 +425,9 @@ const TABLE_HEADER_CONFIG : any = {
     user_order_sub_list : [
        
         {title:"상품명", field:"name",  
-        width:250,
-   
+        width:150,
+     
+        //frozen:true, 
         tooltip: true, // 특정 열에 대한 툴팁 설정
         formatter:function(cell : any){
             var value = cell.getValue();
@@ -437,48 +438,45 @@ const TABLE_HEADER_CONFIG : any = {
  
 
         },
-      
-    
-    
-        {
-            title: "클릭",
-            headerSort: false,
-            formatter: function (cell:any, formatterParams:any, onRendered:any) {
-                var row = cell.getRow();
-                var rowData = row.getData();
+        // {
+        //     title: "클릭",
+        //     headerSort: false,
+        //     formatter: function (cell:any, formatterParams:any, onRendered:any) {
+        //         var row = cell.getRow();
+        //         var rowData = row.getData();
                 
-                // "+" 아이콘 버튼
-                var plusButton = document.createElement("button");
-                plusButton.innerHTML = "<i class='fas fa-plus'></i>"; // Font Awesome 등의 아이콘을 사용하는 예시
-                plusButton.classList.add("icon-button"); // 아이콘 버튼에 클래스 추가
-                plusButton.addEventListener("click", function () {
-                    let add_qty = parseInt(rowData.qty) + 1;
-                    row.update({qty : add_qty});
-                    updateUserOrder(cell);
-                });
+        //         // "+" 아이콘 버튼
+        //         var plusButton = document.createElement("button");
+        //         plusButton.innerHTML = "<i class='fas fa-plus'></i>"; // Font Awesome 등의 아이콘을 사용하는 예시
+        //         plusButton.classList.add("icon-button"); // 아이콘 버튼에 클래스 추가
+        //         plusButton.addEventListener("click", function () {
+        //             let add_qty = parseInt(rowData.qty) + 1;
+        //             row.update({qty : add_qty});
+        //             updateUserOrder(cell);
+        //         });
             
-                // "-" 아이콘 버튼
-                var minusButton = document.createElement("button");
-                minusButton.innerHTML = "<i class='fas fa-minus'></i>"; // Font Awesome 등의 아이콘을 사용하는 예시
-                minusButton.classList.add("icon-button"); // 아이콘 버튼에 클래스 추가
-                minusButton.addEventListener("click", function () {
-                    let minus_qty = Math.max(0, parseInt(rowData.qty) - 1); // 최소값은 0으로 설정
-                    row.update({qty : minus_qty});
-                    updateUserOrder(cell);
-                });
+        //         // "-" 아이콘 버튼
+        //         var minusButton = document.createElement("button");
+        //         minusButton.innerHTML = "<i class='fas fa-minus'></i>"; // Font Awesome 등의 아이콘을 사용하는 예시
+        //         minusButton.classList.add("icon-button"); // 아이콘 버튼에 클래스 추가
+        //         minusButton.addEventListener("click", function () {
+        //             let minus_qty = Math.max(0, parseInt(rowData.qty) - 1); // 최소값은 0으로 설정
+        //             row.update({qty : minus_qty});
+        //             updateUserOrder(cell);
+        //         });
             
-                var container = document.createElement("div");
-                container.style.display = "flex"; // 아이콘 버튼들을 가로로 나란히 표시하기 위해 Flexbox 사용
-                container.style.justifyContent = "space-between"; // 좌우로 간격 주기
-                container.style.margin = "0 5px"; // 좌우 마진 5px 주기
-                container.appendChild(plusButton);
-                container.appendChild(minusButton);
+        //         var container = document.createElement("div");
+        //         container.style.display = "flex"; // 아이콘 버튼들을 가로로 나란히 표시하기 위해 Flexbox 사용
+        //         container.style.justifyContent = "space-between"; // 좌우로 간격 주기
+        //         container.style.margin = "0 5px"; // 좌우 마진 5px 주기
+        //         container.appendChild(plusButton);
+        //         container.appendChild(minusButton);
              
-                return container;
-            }
+        //         return container;
+        //     }
 
-        },
-         {title:"수량", field:"qty", width:150, editor : "input",formatter: "money",  formatterParams: {
+        // },
+         {title:"수량", field:"qty", width:100, editor : "input",formatter: "money",  formatterParams: {
           
             thousand:",",
             precision:false,

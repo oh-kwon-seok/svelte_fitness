@@ -586,9 +586,12 @@ const save = (param,title) => {
              
               table_data['user_order_sub_list'] =   new Tabulator(tableComponent, {
                 tooltips: true, // 전역 설정: 모든 열에 툴팁 적용
-                touch: true,
-                height:"20vh",
-                layout:"fitDataTable",
+              
+
+                height:"50vh",
+                //layout:"fitDataTable",
+                layout:"fitColumns",
+
                 movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
                 locale: TABLE_TOTAL_CONFIG['locale'],
                 langs: TABLE_TOTAL_CONFIG['langs'],
@@ -695,8 +698,11 @@ const userOrderSub2Table = (table_state,tableComponent) => {
   if(update_modal['title'] === 'add'){
     table_data['user_order_sub2_list'] =   new Tabulator(tableComponent, {
       tooltips: true, // 전역 설정: 모든 열에 툴팁 적용
-      height:"20vh",
-      layout:"fitDataTable",
+      height:"50vh",
+      //layout:"fitDataTable",
+      layout:"fitColumns",
+
+
       movableColumns:TABLE_TOTAL_CONFIG['movableColumns'],
       locale: TABLE_TOTAL_CONFIG['locale'],
       langs: TABLE_TOTAL_CONFIG['langs'],
