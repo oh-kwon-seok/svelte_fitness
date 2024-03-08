@@ -14,6 +14,7 @@ import {TOAST_SAMPLE} from '$lib/module/common/constants';
 import {TabulatorFull as Tabulator} from 'tabulator-tables';
 import {TABLE_TOTAL_CONFIG,TABLE_HEADER_CONFIG,TABLE_FILTER} from '$lib/module/common/constants';
 import { setCookie, getCookie, removeCookie } from '$lib/cookies';
+import { infoCallApi } from '../common/function';
 const api = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -217,7 +218,11 @@ const save = (param,title) => {
           update_modal['title'] = '';
           update_modal['update']['use'] = false;
           user_modal_state.update(() => update_modal);
-          user_form_state.update(()=> init_form_data);
+          
+          
+          infoCallApi('user');
+          
+          user_form_state.update(()=> update_form);
         
           return common_toast_state.update(() => toast);
 

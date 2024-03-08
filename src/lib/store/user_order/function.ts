@@ -246,6 +246,7 @@ const save = (param,title) => {
             req_des : param.req_des,
             description : param.description,
             user_id : user_uid,
+            amount : 0,
             car_uid : car_uid,
             used : param.used,
             image_url : param['selectedImage'],  
@@ -300,11 +301,12 @@ const save = (param,title) => {
           uid : param.uid,
           req_date : param.req_date,
           req_des : param.req_des,
-
+          
           order_status : '주문완료',
           price_status : param.price_status,
           user_id : param.user,
           car_uid : param.car,
+          amount : 0,
           used : param.used,
           auth : 'user',
           user_order_sub : checked_data,
@@ -443,6 +445,7 @@ const save = (param,title) => {
             
             order_status : '장바구니',
             price_status : '미수금',
+            amount : 0,
             req_date : param.req_date,
             req_des : param.req_des,
             description : param.description,
@@ -496,7 +499,7 @@ const save = (param,title) => {
           uid : param.uid,
           req_date : param.req_date,
           req_des : param.req_des,
-
+          amount : 0,
           order_status : '장바구니',
           price_status : param.price_status,
           user_id : param.user,
@@ -782,15 +785,6 @@ const userOrderSub2Table = (table_state,tableComponent) => {
     
 
   }
-
- 
-
-
-        
-
-          
-              
-        
 }
 
 const userOrderFileUpload = (e) => {
@@ -947,7 +941,7 @@ const userOrderTabClick = (title) => {
       check_data = table_real_data['user_order_sub_list'];
     }else {
       check_data = table_real_data['user_order_sub_list'].filter(item=> {
-        return item['product']['type'] === title;
+        return item['product']['type']['name'] === title;
       })
     }
     

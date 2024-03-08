@@ -105,7 +105,6 @@
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                   {moment(item['created']).format('YY-MM-DD')} 
                   {item['userOrder'] ?  "[" +item['userOrder']['order_status'] + "]" : ""}
-                  {item['userOrder'] ?  "[" +item['userOrder']['price_status'] + "]" : ""}
                   
 
 

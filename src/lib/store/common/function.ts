@@ -2,7 +2,7 @@
 
 
 import { writable } from 'svelte/store';
-import {common_alert_state,common_toast_state, menu_state,url_state,load_state,common_search_state,login_state,common_product_state,  common_car_state,common_company_state,common_user_state,common_user_order_state,common_user_order_sub_state,table_state,table_real_state } from './state';
+import {common_alert_state,common_toast_state, menu_state,url_state,load_state,common_search_state,login_state,common_product_state,  common_car_state,common_company_state,common_user_state,common_user_order_state,common_user_order_sub_state,table_state,table_real_state, common_type_state,common_type_object_state } from './state';
 
 // import {item_data,item_form_state} from '$lib/store/info/item/state';
 
@@ -42,6 +42,10 @@ let table_real_data : any;
 let product_data : any;
 
 let car_data : any;
+
+let type_data : any;
+
+let type_object_data : any;
 
 let company_data : any;
 
@@ -136,11 +140,8 @@ common_user_order_sub_state.subscribe((data : any) => {
 
 
 const infoCallApi = (title) => {
-
  
   const url = `${api}/${title}/info_select`; 
-  console.log();
-
   const config = {
     headers:{
       "Content-Type": "application/json",
@@ -165,6 +166,23 @@ const infoCallApi = (title) => {
           company_data = res.data;
           common_company_state.update(()=> company_data);
         
+        }else if(title === 'type'){
+          type_data = res.data;
+          common_type_state.update(()=> type_data);
+
+          // if(type_data.length > 0){
+          //   for (let i = 0; i < type_data.length; i++) {
+          //     let item = type_data[i];
+          //     if(type_object_data.hasOwnProperty(item.name)){
+
+          //     }else{
+          //       type_object_data[item.name] = item.name;
+          //     }
+              
+          //   }
+        
+          //   common_type_object_state.update(()=> type_object_data);
+          // }
         }
       
 
@@ -206,7 +224,16 @@ const changeUrl = (obj) => {
 
     if (confirmLogout) {
         // 여기에 로그아웃 로직을 추가하세요.
-        login_data = init_login_data;
+        login_data = {
+          user_idx : "",
+          id : "",
+          name : "",
+          password : "",
+          token :"",
+        
+          status : false,
+          
+        };
         
         removeCookie('my-cookie');
         removeCookie('password');
@@ -267,9 +294,7 @@ const onChangeHandler = (e) => {
   const tokenChange = (token) => {
     
     login_data['token'] = token;
-    console.log('tocken',token);
-
-    console.log(' login_data', login_data);
+   
 
     login_state.update(()=> login_data);
   
@@ -279,7 +304,7 @@ const onChangeHandler = (e) => {
 
   const handleToggle = (title) => {
    
-    console.log('title', title);
+ 
     
     menu_data[title] = !menu_data[title];
     menu_state.update(()=> menu_data);

@@ -12,7 +12,7 @@
     
 
     import {user_order_modal_state, user_order_form_state} from '$lib/store/user_order/state';
-    import {common_alert_state, common_toast_state,common_car_state,table_state,table_real_state, login_state} from '$lib/store/common/state';
+    import {common_alert_state, common_toast_state,common_car_state,table_state,table_real_state, login_state, common_type_state} from '$lib/store/common/state';
     import { setCookie, getCookie, removeCookie } from '$lib/cookies';
 
     import {save,userOrderSubTable,userTable,userOrderFileUpload,tempSave,modalClose,userOrderTabClick,userOrderSub2Table} from '$lib/store/user_order/function';
@@ -99,9 +99,13 @@
 
           <ul class="flex list-none overflow-x-auto whitespace-nowrap pt-2.5 border-b-2 border-solid border-indigo-500 ">
 
-            {#each PROD_TYPE_ARRAY as item} 
+            <li class="mr-2.5 ">
+              <a href="#" class="no-underline font-bold text-blue-800 rounded-s-md transition duration-300 ease  hover:bg-sky-300 transition duration-300 ease" on:click={()=>userOrderTabClick("전체")}>{"전체"}</a>
+            </li>
+
+            {#each $common_type_state as item} 
               <li class="mr-2.5 ">
-                <a href="#" class="no-underline font-bold text-blue-800 rounded-s-md transition duration-300 ease  hover:bg-sky-300 transition duration-300 ease" on:click={()=>userOrderTabClick(item)}>{item}</a>
+                <a href="#" class="no-underline font-bold text-blue-800 rounded-s-md transition duration-300 ease  hover:bg-sky-300 transition duration-300 ease" on:click={()=>userOrderTabClick(item.name)}>{item.name}</a>
               </li>
             {/each}
 

@@ -119,7 +119,7 @@ const naver_state = btoa(binaryString);
 		$common_alert_state = {type : 'login', value : false};
 		
 		
-		const url = `${api}/user/sign-in`
+		const url = `${api}/user/mobile-signin`
 		try {
 			// await performAsyncTask();
 

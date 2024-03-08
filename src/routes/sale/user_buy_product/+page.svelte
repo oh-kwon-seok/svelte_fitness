@@ -100,7 +100,7 @@
               <!-- <Icon.TruckSolid class='mr-2' size="20" /> -->
               <div class="flex-1 min-w-0">
                 <p class="whitespace-normal text-sm font-medium text-gray-900 truncate dark:text-white">
-                  {"["+item['product']['type'] + "] " + item['product']['name']}
+                  {"["+item['product']['type']['name'] + "] " + item['product']['name']}
                 </p>
                 <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                   {moment(item['created']).format('YY-MM-DD HH:mm:ss')}

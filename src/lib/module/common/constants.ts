@@ -349,7 +349,7 @@ const TABLE_HEADER_CONFIG : any = {
         cell.getRow().toggleSelect();
         console.log(cell.getRow());
     }},
-    {title:"분류", field:"type", width:150, headerFilter:"list",headerFilterParams:{values:TABLE_HEADER_LIST_FILTER['type']}, clearable:true},
+    {title:"분류", field:"type.name", width:150, headerFilter:"list",headerFilterParams:{values:TABLE_HEADER_LIST_FILTER['type']}, clearable:true},
      
     {title:"상품명", field:"name", width:250, headerFilter:"input", 
     formatter:function(cell : any){
