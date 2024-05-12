@@ -72,9 +72,12 @@ function generateRandomString(length:number) {
 	return result;
 	}
 
-
-
-
+    function passwordCheck(password:string) {
+        // 최소한 하나의 문자, 하나의 숫자, 하나의 특수문자를 포함하는지 확인하는 정규표현식 (로그인,회원가입할때 씀)
+        var regex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\\\|\[\]{};:\'",.<>\/?]).{8,}$/;
+        return regex.test(password);
+    }
+    
 
 
 export {
@@ -83,5 +86,6 @@ export {
     phoneNumber,
     validEmail,
     updateSupplyPrice,
-    generateRandomString
+    generateRandomString,
+    passwordCheck
 }
