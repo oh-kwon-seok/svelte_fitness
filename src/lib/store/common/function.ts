@@ -2,7 +2,7 @@
 
 
 import { writable } from 'svelte/store';
-import {common_alert_state,common_toast_state, menu_state,url_state,load_state,common_search_state,login_state,common_product_state,  common_car_state,common_company_state,common_user_state,common_user_order_state,common_user_order_sub_state,table_state,table_real_state, common_type_state,common_type_object_state } from './state';
+import {common_alert_state,common_toast_state, menu_state,url_state,load_state,common_search_state,login_state,common_product_state,  common_car_state,common_company_state,common_user_state,common_user_order_state,common_user_order_sub_state,table_state,table_real_state, common_type_state,common_type_object_state, common_week_schedule_state } from './state';
 
 // import {item_data,item_form_state} from '$lib/store/info/item/state';
 
@@ -54,6 +54,9 @@ let user_data : any;
 let user_order_data : any;
 
 let user_order_sub_data : any;
+
+let week_schedule_data : any;
+
 
 const workbook = new Excel.Workbook();
 
@@ -133,6 +136,11 @@ common_user_order_state.subscribe((data : any) => {
 
 common_user_order_sub_state.subscribe((data : any) => {
   user_order_sub_data = data;
+})
+
+
+common_week_schedule_state.subscribe((data : any) => {
+  week_schedule_data = data;
 })
 
 
@@ -899,11 +907,38 @@ const excelDownload = (type,config) => {
 
 
 
+    const selectWeekScheduleQuery = (user_id) => {
+      const startOfWeek = moment().startOf('week').add(1, 'days').format('YYYY-MM-DD');  // 월요일 시작
+      const endOfWeek = moment().endOf('week').add(1, 'days').format('YYYY-MM-DD');      // 일요일 끝
 
+      const url = `${api}/edu_schedule/select`; 
+      let params = 
+      {
+        start_date : startOfWeek,
+        end_date  : endOfWeek,
+        user_id : user_id,
+      
+      };
+      console.log('params : ', params);
+      const config = {
+        params : params,
+        headers:{
+          "Content-Type": "application/json",
+          
+        }
+       }
+  
 
+     
+  
+        axios.get(url,config).then(res=>{
+         
+            week_schedule_data = res.data;
+            console.log('res.data : ', res.data);
+            common_week_schedule_state.update(() => week_schedule_data);
+       })
+    }
 
-
-   
 
 
 export {handleToggle, 
@@ -928,5 +963,6 @@ export {handleToggle,
   select_query,
   selectCardQuery,
   logout,
+  selectWeekScheduleQuery
 
 }

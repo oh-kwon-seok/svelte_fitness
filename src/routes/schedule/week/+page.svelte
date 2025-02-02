@@ -8,8 +8,12 @@
 
 	    
     import {selectWeekScheduleQuery} from '$lib/store/common/function';
+     // SvelteKit이 load 함수에서 반환한 값을 data로 받습니다.
+     export let data: { userId: string };
 
- 
+// data.userId를 통해 값을 사용
+    let userId = data.userId;
+    
 
     // 회원 데이터 타입 정의
     type Member = {
@@ -24,10 +28,9 @@
     let memberData: Member[] = [];
 
     // 로그인한 사용자 ID를 받아오기 위한 변수
-    let userId = "ohjin999";  // 실제로 로그인 상태라면 이 값을 동적으로 처리할 수 있습니다.
-
+    
     // API 엔드포인트
-    const api = "http://localhost:8081";
+    const api = "http://172.20.10.4:8081";
 
     // 이번 주 스케줄 데이터를 불러오기 위한 함수
     
@@ -61,25 +64,25 @@
     onMount(() => {
         
    
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-
-
-        selectWeekScheduleQuery(userId); // API 요청으로 이번 주 스케줄 데이터 불러오기
-
-        // 이번 주 날짜 목록 (월~일)
-        const startOfWeek = moment().startOf('week').add(1, 'days');
-        const endOfWeek = moment().endOf('week').add(1, 'days');
-
-        currentWeekDates = [
-            startOfWeek.format('YYYY-MM-DD'),
-            startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
-            startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
-            startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
-            startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
-            startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
-            endOfWeek.format('YYYY-MM-DD'),
-        ];
-    });
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+    
+    
+            selectWeekScheduleQuery(userId); // API 요청으로 이번 주 스케줄 데이터 불러오기
+    
+            // 이번 주 날짜 목록 (월~일)
+            const startOfWeek = moment().startOf('week').add(1, 'days');
+            const endOfWeek = moment().endOf('week').add(1, 'days');
+    
+            currentWeekDates = [
+                startOfWeek.format('YYYY-MM-DD'),
+                startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
+                startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
+                startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
+                startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
+                startOfWeek.add(1, 'days').format('YYYY-MM-DD'),
+                endOfWeek.format('YYYY-MM-DD'),
+            ];
+        });
 
    
 </script>
@@ -142,16 +145,15 @@
             </table>
         </div>
         <div>
-           <!-- 광고 슬롯 -->
-<!-- 웹광고 -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-2691614403272396"
-     data-ad-slot="5371183155"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-           
-          </div>
-
+            <!-- 광고 슬롯 -->
+ <!-- 웹광고 -->
+ <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-2691614403272396"
+      data-ad-slot="5371183155"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+            
+           </div>
     </div>
 </div>
